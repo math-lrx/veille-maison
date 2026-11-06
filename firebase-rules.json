@@ -1,0 +1,11 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "veille": {
+      "marks_m": { ".read": true, "$k": { ".write": true, ".validate": "newData.hasChildren() && (!newData.child('s').exists() || newData.child('s').val()==='' || newData.child('s').val()==='like' || newData.child('s').val()==='rej') && (!newData.child('n').exists() || (newData.child('n').isString() && newData.child('n').val().length<=2000))" } },
+      "marks_j": { ".read": true, "$k": { ".write": true, ".validate": "newData.hasChildren() && (!newData.child('s').exists() || newData.child('s').val()==='' || newData.child('s').val()==='like' || newData.child('s').val()==='rej') && (!newData.child('n').exists() || (newData.child('n').isString() && newData.child('n').val().length<=2000))" } },
+      "scan": { ".read": true, ".write": true }
+    }
+  }
+}
