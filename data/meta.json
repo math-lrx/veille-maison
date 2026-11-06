@@ -1,0 +1,225 @@
+{
+ "finished": "2026-11-06",
+ "sources": [
+  {
+   "n": "Bien'ici",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Leboncoin",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "SeLoger",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "AVendreALouer",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Orpi",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Laforêt",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Century 21",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "PAP",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Logic-Immo",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Properstar",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Notaires",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Montaury",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Moreira",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Capitelles",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Tissot",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Atrium",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Conception Immo",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Cabinet Agir",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Agence Grand Nîmes",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Interkab",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "H4",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Agence du Midi",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Immoregard",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Ceres",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "MPC",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Patrimoine Habitat",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Ici et Là",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Bienveo",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "ImmoPlanète",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Accent du Sud",
+   "st": "ok",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "ParuVendu (limite de débit)",
+   "st": "bloque",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Immobilier Manduel",
+   "st": "bloque",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Immobilier Vaunage",
+   "st": "bloque",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Immobilier Marguerittes",
+   "st": "bloque",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Pont-du-Gard Immobilier",
+   "st": "bloque",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Méridional",
+   "st": "bloque",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Kyero",
+   "st": "bloque",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Cabinet PLH",
+   "st": "injoignable",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Calini",
+   "st": "injoignable",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Immo-Diffusion",
+   "st": "injoignable",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "AD Immo",
+   "st": "injoignable",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Set Immo",
+   "st": "injoignable",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Pierres au Soleil",
+   "st": "injoignable",
+   "d": "2026-11-06"
+  },
+  {
+   "n": "Maisons-Appartements",
+   "st": "injoignable",
+   "d": "2026-11-06"
+  }
+ ]
+}

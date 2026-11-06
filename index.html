@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e6a70">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Veille maison">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e6a70'/%3E%3Cpath d='M6 16 16 7l10 9v9H6z' fill='none' stroke='white' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>Veille Maison Nîmes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Carnet de prospection: liste dense filtrable, une ligne par bien, pastille de distance à la gare en premier repère */
+:root{--bg:#eef2f1;--panel:#fff;--ink:#16252b;--mute:#5d6f76;--line:#d5dedd;--accent:#0e6a70;--accent-ink:#fff;--good:#1b7a45;--warn:#a85d00;--bad:#b3362b;--chip:#e3ebea;--like:#dcefe3;--rej:#f3dcd8;--cm:#2456a8;--cj:#b03a78;--gold:#b9830a;
+--f-d:"Bricolage Grotesque",system-ui,sans-serif;--f-b:"IBM Plex Sans",system-ui,sans-serif;--f-m:"IBM Plex Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1e;--panel:#18262b;--ink:#e5eeee;--mute:#92a6ab;--line:#2b3d43;--accent:#52c1c7;--accent-ink:#0b1a1d;--good:#5fd18c;--warn:#f0a94a;--bad:#f2877d;--chip:#223338;--like:#1c3a2a;--rej:#3d2420;--cm:#7fb0ff;--cj:#f08cc0;--gold:#f0c24a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a1e;--panel:#18262b;--ink:#e5eeee;--mute:#92a6ab;--line:#2b3d43;--accent:#52c1c7;--accent-ink:#0b1a1d;--good:#5fd18c;--warn:#f0a94a;--bad:#f2877d;--chip:#223338;--like:#1c3a2a;--rej:#3d2420;--cm:#7fb0ff;--cj:#f08cc0;--gold:#f0c24a;color-scheme:dark}
+html{color-scheme:light}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--f-b);padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1100px;margin:0 auto}
+h1{font:700 26px/1.1 var(--f-d);margin:0 0 4px;text-wrap:balance}
+.sub{color:var(--mute);margin:0 0 16px;max-width:70ch}
+.bar{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);padding:6px 11px;font:500 13px var(--f-b);cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+select,input[type=text],textarea{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:13px var(--f-b);min-width:0}
+label.t{display:inline-flex;gap:5px;align-items:center;font-size:13px;cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{color:var(--mute);font-size:13px;margin-left:auto}
+.list{display:flex;flex-direction:column;gap:8px}
+.it{background:var(--panel);border:1px solid var(--line);border-radius:6px;display:grid;grid-template-columns:130px minmax(0,1fr) auto;gap:6px 14px;padding:10px 12px}
+.it.like{background:var(--like);border:2px solid var(--good);padding:9px 11px;box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 25%,transparent)}
+.it.sold{border:2px solid var(--bad)}
+.it.exc{opacity:.6;border-style:dashed}
+.sbar{grid-column:1/-1;background:var(--bad);color:#fff;font:700 13px var(--f-d);letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:4px;margin:-2px 0 2px}
+.tag-like{display:inline-block;background:var(--good);color:var(--accent-ink);font:700 11px var(--f-d);letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:3px;margin-left:8px;vertical-align:2px}
+.exr{font-size:12px;color:var(--warn);margin-top:4px}
+.num{width:68px}
+.it.rej{background:var(--rej);opacity:.78}
+.price{font:500 18px var(--f-m);white-space:nowrap}
+.drop{display:block;font:500 12px var(--f-m);color:var(--good)}
+.was{color:var(--mute);text-decoration:line-through}
+.main{min-width:0}
+.loc{font:600 15px var(--f-d)}
+.loc small{font:400 13px var(--f-b);color:var(--mute)}
+.spec{font:13px var(--f-m);color:var(--mute);margin:2px 0 6px}
+.badges{display:flex;flex-wrap:wrap;gap:4px}
+.b{background:var(--chip);border-radius:4px;padding:1px 7px;font-size:12px;white-space:nowrap}
+.b.y{background:var(--good);color:var(--accent-ink)}
+.b.w{color:var(--warn);border:1px solid var(--warn);background:transparent}
+.b.n{color:var(--mute)}
+.dist{margin-top:6px;font-size:12.5px}
+.pill{display:inline-block;border-radius:10px;padding:1px 9px;font-weight:600;font-size:12px;margin-right:6px}
+.pill.pied{background:var(--good);color:var(--accent-ink)}
+.pill.court{background:var(--accent);color:var(--accent-ink)}
+.pill.voiture{background:var(--chip);color:var(--ink);border:1px solid var(--line)}
+.pill.loin,.pill.inconnue{background:transparent;color:var(--warn);border:1px solid var(--warn)}
+.est{color:var(--mute)}
+.act{display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:104px}
+.act button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:5px 9px;font:500 13px var(--f-b);cursor:pointer}
+.act button[aria-pressed=true].l{background:var(--good);border-color:var(--good);color:var(--accent-ink)}
+.act button[aria-pressed=true].r{background:var(--bad);border-color:var(--bad);color:var(--accent-ink)}
+.links{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12.5px;margin-top:6px}
+.links a{color:var(--accent)}
+.lk{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.lk .pp{font:12px var(--f-m);color:var(--mute)}
+.lk.low a{font-weight:600}
+.lk.low .pp{color:var(--good);font-weight:600}
+.cheap{display:inline-flex;align-items:center;gap:3px;background:var(--good);color:var(--accent-ink);border-radius:10px;padding:0 7px;font:700 11px var(--f-d);letter-spacing:.03em}
+.gap{font:12px var(--f-m);color:var(--mute);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:14px;padding:3px 10px;font:500 13px var(--f-b);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip small{color:inherit;opacity:.75;margin-left:3px}
+.b.dbl{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.b.dbl2{border:1px dashed var(--accent);color:var(--accent);background:transparent}
+.b svg{width:15px;height:12px;vertical-align:-1px;margin-right:3px}
+.extra{grid-column:2 / 4;display:flex;flex-direction:column;gap:6px}
+.hist{font:12px var(--f-m);color:var(--mute)}
+.note{width:100%;resize:vertical;min-height:34px}
+.av{display:inline-flex;align-items:center;gap:2px;border-radius:12px;padding:0 7px 0 3px;font:700 11px var(--f-d);color:#fff;background:var(--cm);white-space:nowrap}
+.av.j{background:var(--cj)}
+.av b{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:rgba(255,255,255,.28);font-size:11px}
+.av.none{background:transparent;color:var(--mute);border:1px dashed var(--mute)}
+.av.none b{background:transparent}
+.who{display:inline-flex;gap:5px;margin-left:8px;vertical-align:1px}
+#who{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--bg) 94%,transparent);display:flex;align-items:center;justify-content:center;padding:16px}
+#who[hidden]{display:none}
+.whobox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px;max-width:440px;width:100%;text-align:center}
+.whobox h2{font:700 22px var(--f-d);margin:0 0 6px}
+.whobox p{color:var(--mute);font-size:13px;margin:12px 0 0}
+.whobtns{display:flex;gap:12px;margin-top:16px}
+.whobtns button{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:600 17px var(--f-d);cursor:pointer}
+.whobtns button[data-u=m]:hover,.whobtns button[data-u=m]:focus-visible{border-color:var(--cm)}
+.whobtns button[data-u=j]:hover,.whobtns button[data-u=j]:focus-visible{border-color:var(--cj)}
+.whobtns .big{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font:700 22px var(--f-d);background:var(--cm)}
+.whobtns [data-u=j] .big{background:var(--cj)}
+.whobtns small{font:400 12px var(--f-b);color:var(--mute)}
+.top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-start;justify-content:space-between}
+#whoBtn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:18px;padding:4px 12px 4px 5px;font:500 13px var(--f-b);cursor:pointer}
+#whoBtn .big{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font:700 12px var(--f-d)}
+.alerts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.alerts:empty{display:none}
+.al{border:1px solid;border-radius:8px;padding:6px 12px;font:600 13px var(--f-b);cursor:pointer;background:var(--panel)}
+.al.conf{color:var(--bad);border-color:var(--bad)}
+.al.oth{color:var(--ink)}
+.al.both{color:var(--gold);border-color:var(--gold)}
+.al.oth.m{border-color:var(--cm)}.al.oth.j{border-color:var(--cj)}
+.it.o-m:not(.like):not(.rej){box-shadow:inset 6px 0 0 var(--cm)}
+.it.o-j:not(.like):not(.rej){box-shadow:inset 6px 0 0 var(--cj)}
+.it.both{border:2px solid var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 30%,transparent)}
+.it.cf{border:2px solid var(--bad)}
+.dvb{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.dv{border-radius:5px;padding:3px 10px;font:600 12.5px var(--f-b);border:1px solid}
+.dv.conf{background:var(--bad);border-color:var(--bad);color:#fff}
+.dv.attn,.dv.excl{background:transparent;border-color:var(--warn);color:var(--warn)}
+.dv.wait{background:transparent;border-color:var(--mute);color:var(--mute);font-weight:500}
+.dv.both{background:var(--gold);border-color:var(--gold);color:#fff}
+.onote{font-size:12.5px;color:var(--mute);font-style:italic;border-left:3px solid var(--line);padding-left:8px}
+.onote b{font-style:normal}
+.pg{margin-bottom:12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px}
+.pg[hidden]{display:none}
+.pgt{height:8px;background:var(--chip);border-radius:4px;overflow:hidden;margin-top:6px}
+.pgt i{display:block;height:100%;background:var(--accent);transition:width .4s}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 12px;color:var(--mute);font-size:13px}
+#last.stale{color:var(--warn);font-weight:600}
+.lnk{background:none;border:0;padding:0;color:var(--accent);font:500 13px var(--f-b);text-decoration:underline;cursor:pointer}
+.about{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 14px;margin-bottom:14px;max-width:80ch;font-size:13px;color:var(--mute)}
+.about[hidden]{display:none}
+.srcs ul{columns:2;margin:4px 0 8px;padding-left:18px}
+@media (max-width:520px){.srcs ul{columns:1}}
+.foot{color:var(--mute);font-size:12.5px;margin-top:18px;max-width:80ch}
+.empty{padding:28px;text-align:center;color:var(--mute);background:var(--panel);border:1px dashed var(--line);border-radius:6px}
+.status{font-size:12px;color:var(--mute)}
+@media (max-width:640px){.it{grid-template-columns:minmax(0,1fr) auto}.price-col{grid-column:1/2}.main{grid-column:1/3;order:3}.act{grid-column:2/3;grid-row:1;flex-direction:row;min-width:0}.extra{grid-column:1/3;order:4}}
+</style>
+</head>
+<body>
+<div id="who" role="dialog" aria-modal="true" aria-labelledby="whoT"><div class="whobox"><h2 id="whoT">Qui consulte la veille ?</h2><div>Choisissez votre profil pour retrouver vos choix.</div><div class="whobtns"><button type="button" data-u="m"><span class="big">M</span>Mathieu<small></small></button><button type="button" data-u="j"><span class="big">J</span>Julia<small></small></button></div><p>Vos choix, vos notes et ceux de l'autre sont affichés côte à côte; les désaccords sont signalés.</p></div></div>
+<div class="wrap">
+<div class="top"><h1>Veille maison Nîmes</h1><button id="whoBtn" type="button" hidden aria-label="Changer d'utilisateur"></button></div>
+<div class="meta"><span id="last"></span><button id="aboutBtn" type="button" class="lnk" aria-expanded="false" aria-controls="about">À propos et critères</button></div>
+<div id="about" class="about" hidden>
+<p><b>Critères de recherche.</b> Maisons à vendre jusqu'à 400 000 €, 90 m² minimum, 3 chambres minimum. Recherche A: Nîmes. Recherche B: Caissargues, Bouillargues, Redessan, Rodilhan, Garons, Manduel, Bellegarde, Générac.</p>
+<p><b>Sources.</b> Données du <span id="scan"></span>: Bien'ici, Leboncoin, SeLoger, ParuVendu, Orpi, Laforêt, Century 21, AVendreALouer, Logic-Immo, PAP, notaires et quelques agences locales (Montaury, Moreira), doublons fusionnés (Figaro Immo et Ouest-France Immo inaccessibles ou hors secteur).</p>
+<p><b>Veille partagée.</b> Chacun garde ses propres choix et notes, et voit ceux de l'autre. Les désaccords sont signalés.</p>
+<div id="srcs" class="srcs"></div>
+<p>Les règles d'exclusion, les symboles et les limites de la lecture des annonces sont détaillés en bas de page.</p>
+</div>
+<div class="pg" id="scanp" hidden role="status"></div>
+<div class="alerts" id="alerts"></div>
+<div class="bar">
+ <div class="row">
+  <div class="seg" id="sGrp" role="group" aria-label="Recherche"><button data-v="all" aria-pressed="true">Tout</button><button data-v="A">A · Nîmes</button><button data-v="B">B · Communes</button></div>
+  <div class="chips" id="sSt" role="group" aria-label="Statut"><button class="chip" data-v="act" aria-pressed="true">Actifs</button><button class="chip" data-v="like">Mes intérêts</button><button class="chip" data-v="todo">À trier</button><button class="chip" data-v="rej">Rejetés</button><button class="chip" data-v="oth" id="cOth">Intérêts de l'autre</button><button class="chip" data-v="both">★ Communs</button><button class="chip" data-v="div">⚠ À discuter</button></div>
+  <span class="count" id="cnt"></span>
+ </div>
+ <div class="row">
+  <div class="chips" id="fCity" role="group" aria-label="Communes"></div>
+  <select id="fDist" aria-label="Distance gare"><option value="">Distance gare: toutes</option><option value="pied">À pied (≈15 min ou moins)</option><option value="near">À pied ou court trajet</option><option value="ok">Jusqu'à 15 min voiture/bus</option></select>
+  <select id="fBd" aria-label="Chambres"><option value="3">3 chambres ou plus</option><option value="4">4 chambres ou plus</option><option value="5">5 chambres ou plus</option></select>
+  <label class="t">Prix max <input type="text" id="fMax" inputmode="numeric" size="7" value="400000"></label>
+  <label class="t">Surface habitable <input type="text" id="fAmin" class="num" inputmode="numeric" placeholder="min" aria-label="Surface minimale"> à <input type="text" id="fAmax" class="num" inputmode="numeric" placeholder="max" aria-label="Surface maximale"> m²</label>
+  <select id="fSort" aria-label="Tri"><option value="p">Prix croissant</option><option value="pd">Prix décroissant</option><option value="drop">Baisse de prix</option><option value="new">Plus récentes</option><option value="dist">Distance gare</option><option value="a">Surface</option></select>
+ </div>
+ <div class="row">
+  <label class="t"><input type="checkbox" id="tG"> Garage confirmé</label>
+  <label class="t"><input type="checkbox" id="tP"> Piscine</label>
+  <label class="t"><input type="checkbox" id="tC"> Clim</label>
+  <label class="t"><input type="checkbox" id="tM"> Non mitoyenne</label>
+  <label class="t"><input type="checkbox" id="tV"> Cave / sous-sol</label>
+  <label class="t"><input type="checkbox" id="tL"> 2 logements (ou 2e logement possible)</label>
+  <label class="t"><input type="checkbox" id="tD"> En baisse</label>
+  <label class="t"><input type="checkbox" id="tT"> Sans travaux</label>
+  <label class="t"><input type="checkbox" id="tX"> Afficher les exclus par mes règles (<span id="nx">0</span>)</label>
+ </div>
+</div>
+<div class="status" id="st" role="status"></div>
+<div class="list" id="list"></div>
+<p class="foot">Distances à la gare centrale de Nîmes: pour Nîmes, calcul à vol d'oiseau depuis la position approximative de l'annonce (marche ≈ 1,3 fois plus longue), sauf si l'annonce cite un temps. Pour les communes, temps de voiture estimés. L'historique des prix démarre au premier relevé; l'ancien prix Leboncoin sert de repère quand il existe. Un garage ou une absence de mitoyenneté « non confirmé » n'a pas été trouvé dans le texte de l'annonce. Règles d'exclusion appliquées au texte des annonces: pas de permis de construire, maison de ville sans vrai jardin (recherche A), maison de ville ou de village non confirmée non mitoyenne ou sans vrai jardin (recherche B). Les biens exclus restent consultables avec la case « Afficher les exclus ». « Cave / sous-sol » recouvre cave, caveau, sous-sol et semi-enterré, lus dans le texte de l'annonce (non relevé sur les annonces dont le texte n'a pu être relu). Le symbole « 2 logements » signale une maison avec deux logements distincts ou un logement indépendant déjà aménagé (étage, studio, appartement attenant); « 2e logement possible » signale que l'annonce évoque la possibilité d'en créer un. La mention « moins cher » désigne la plateforme qui affiche le prix le plus bas pour un même bien, quand les prix diffèrent.</p>
+</div>
+<script>
+let L=[],SCAN="2026-11-06",meta={};
+const $=id=>document.getElementById(id);
+const eur=n=>n.toLocaleString('fr-FR').replace(/ /g,' ')+' €';
+let marks={},prices={items:{}},db=null,F={grp:'all',st:'act'},F_cities,scanSt=null;
+const NAMES={m:'Mathieu',j:'Julia'},FEM={m:false,j:true},COL={m:'marks_m',j:'marks_j'};
+let U=null,all={m:{},j:{}};
+const O=()=>U==='m'?'j':'m';
+const om=k=>(all[O()]||{})[k]||{};
+const ints=p=>FEM[p]?'intéressée':'intéressé';
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function dv(x){const r=[];if(!U)return r;const a=(marks[x.k]||{}).s||'',b=om(x.k).s||'';
+ if(a==='like'&&b==='like')r.push('both');
+ else if((a==='like'&&b==='rej')||(a==='rej'&&b==='like'))r.push('conf');
+ else if(b==='like'&&!a)r.push('attn');
+ else if(a==='like'&&!b)r.push('wait');
+ if(x.ex&&(a==='like'||b==='like'))r.push('excl');
+ return r}
+function av(p,s){const g=s==='like'?'♥':s==='rej'?'✕':'…';const lab=s==='like'?ints(p):s==='rej'?'a rejeté':'à trier';return `<span class="av ${p}${s?'':' none'}" title="${NAMES[p]}: ${lab}"><b>${NAMES[p][0]}</b>${g}</span>`}
+let cities=[];
+const mkCities=()=>{cities=[...new Set(L.map(x=>x.c))].sort((a,b)=>a==='Nîmes'?-1:b==='Nîmes'?1:a.localeCompare(b,'fr'))};
+F_cities=new Set();
+function hist(x){return (prices.items&&prices.items[x.k])||[[null,x.o||x.p],[SCAN,x.p]].filter((h,i)=>i||x.o)}
+function trend(x){const h=hist(x);const first=h[0][1],last=h[h.length-1][1];return {first,last,diff:last-first,h}}
+const DR={pied:0,court:1,voiture:2,loin:3,inconnue:4};
+function pass(x,ign){
+ const m=marks[x.k]||{};const s=m.s||'';
+ if(F.grp!=='all'&&x.grp!==F.grp)return false;
+ const b=om(x.k).s||'';
+ if(F.st==='act'&&s==='rej'&&b!=='like')return false;if(F.st==='todo'&&s)return false;if(F.st==='like'&&s!=='like')return false;if(F.st==='rej'&&s!=='rej')return false;
+ if(F.st==='oth'&&b!=='like')return false;if(F.st==='both'&&!(s==='like'&&b==='like'))return false;if(F.st==='div'&&!dv(x).some(c=>c==='conf'||c==='excl'))return false;
+ if(!ign&&F_cities.size&&!F_cities.has(x.c))return false;
+ const d=$('fDist').value;if(d==='pied'&&x.dc!=='pied')return false;if(d==='near'&&!['pied','court'].includes(x.dc))return false;if(d==='ok'&&!['pied','court','voiture'].includes(x.dc))return false;
+ if(x.ex&&!$('tX').checked&&s!=='like'&&b!=='like')return false;
+ if(x.b<+$('fBd').value)return false;
+ const a0=+($('fAmin').value.replace(/\D/g,''))||0,a1=+($('fAmax').value.replace(/\D/g,''))||0;if(a0&&x.a<a0)return false;if(a1&&x.a>a1)return false;
+ const mx=+($('fMax').value.replace(/\D/g,''))||0;if(mx&&trend(x).last>mx)return false;
+ if($('tG').checked&&x.g!=='o')return false;if($('tP').checked&&x.pi!=='o')return false;if($('tC').checked&&!x.cl)return false;
+ if($('tM').checked&&x.mi!=='n')return false;if($('tV').checked&&!x.ca)return false;if($('tL').checked&&!x.lg)return false;if($('tD').checked&&!(trend(x).diff<0))return false;if($('tT').checked&&x.tr!=='n')return false;
+ return true}
+function sorter(){const v=$('fSort').value;const t=x=>trend(x);
+ return {p:(a,b)=>t(a).last-t(b).last,pd:(a,b)=>t(b).last-t(a).last,drop:(a,b)=>t(a).diff-t(b).diff,new:(a,b)=>(b.pub||b.mod).localeCompare(a.pub||a.mod),dist:(a,b)=>DR[a.dc]-DR[b.dc]||t(a).last-t(b).last,a:(a,b)=>b.a-a.a}[v]}
+const HOUSE2='<svg viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M1 7l4.5-4.5L10 7v6H1zM10 7l4.5-4.5L19 7v6h-9"/></svg>';
+function badges(x){const o=[];
+ o.push(x.g==='o'?`<span class="b y">Garage${x.gm?' '+x.gm+' m²':''}</span>`:`<span class="b w">Garage non confirmé</span>`);
+ if(x.pi==='o')o.push('<span class="b y">Piscine</span>');else if(x.pi==='p')o.push('<span class="b">Piscine possible</span>');
+ if(x.cl)o.push('<span class="b y">Clim</span>');if(x.ca)o.push('<span class="b y">Cave / sous-sol</span>');
+ o.push(x.mi==='n'?'<span class="b y">Non mitoyenne</span>':x.mi==='o'?'<span class="b n">Mitoyenne</span>':'<span class="b n">Mitoyenneté ?</span>');
+ if(x.bu)o.push('<span class="b">Bureau</span>');if(x.p2)o.push('<span class="b">2e véhicule</span>');if(x.pl)o.push('<span class="b">Plain-pied</span>');
+ if(x.lg===2)o.push(`<span class="b dbl" title="Deux logements distincts (ou logement indépendant déjà aménagé) mentionnés dans l'annonce">${HOUSE2}2 logements</span>`);else if(x.lg===1)o.push(`<span class="b dbl2" title="L'annonce évoque la possibilité de créer ou d'aménager un second logement (studio, étage indépendant…)">${HOUSE2}2e logement possible</span>`);
+ if(x.ur)o.push('<span class="b n">Type maison de ville/village</span>');
+ if(x.jd&&!x.jt)o.push('<span class="b y">Jardin</span>');else if(x.jt)o.push('<span class="b w">Jardinet / petite cour</span>');else if(x.te)o.push('<span class="b w">Terrasse/balcon seulement</span>');
+ if(x.pd&&!x.o)o.push('<span class="b y">Baisse signalée (montant inconnu)</span>');
+ if(x.tr==='l')o.push('<span class="b w">Rafraîchissement</span>');if(x.pa)o.push('<span class="b">Particulier</span>');
+ return o.join('')}
+function lowInfo(x){const ps=x.u.map(u=>u[2]).filter(Boolean);if(ps.length<2)return null;const mn=Math.min(...ps),mx=Math.max(...ps);return mn===mx?null:{mn,mx}}
+function linksHtml(x){const li=lowInfo(x);return x.u.map(u=>{const low=li&&u[2]===li.mn;return `<span class="lk${low?' low':''}"><a href="${u[1]}" target="_blank" rel="noopener">${u[0]}</a>${u[2]?`<span class="pp">${eur(u[2])}</span>`:''}${low?'<span class="cheap" title="Prix affiché le plus bas parmi les plateformes relevées">▼ moins cher</span>':''}</span>`}).join('')}
+function gapHtml(x){const li=lowInfo(x);return li?`<div class="gap">Écart entre plateformes: ${eur(li.mx-li.mn)} (de ${eur(li.mn)} à ${eur(li.mx)})</div>`:''}
+function card(x){
+ const m=marks[x.k]||{},s=m.s||'',t=trend(x),o=om(x.k),os=o.s||'',dd=dv(x);
+ const drop=t.diff<0?`<span class="drop">${eur(t.diff).replace('-','−')} <span class="was">${eur(t.first)}</span></span>`:t.diff>0?`<span class="drop" style="color:var(--bad)">+${eur(t.diff)}</span>`:'';
+ const hs=t.h.map(h=>`${h[0]?new Date(h[0]).toLocaleDateString('fr-FR'):'ancien prix affiché (date inconnue)'} ${eur(h[1])}`).join(' → ');
+ const d=document.createElement('div');d.className='it '+s+(x.st?' sold':'')+(x.ex?' exc':'')+(os==='like'?' o-'+O():'')+(dd.includes('both')?' both':'')+(dd.includes('conf')?' cf':'');d.dataset.k=x.k;
+ d.innerHTML=`${dd.length?`<div class="dvb">${dvHtml(x,dd,s,os)}</div>`:''}${x.st?`<div class="sbar">${x.st==='vendu'?'Vendu':'Sous compromis / sous offre'}: ne plus compter dessus</div>`:''}<div class="price-col"><div class="price">${eur(t.last)}</div>${drop}</div>
+ <div class="main"><div class="loc">${x.c}${U?`<span class="who">${av(U,s)}${av(O(),os)}</span>`:''}${x.q&&x.q!==x.c?` <small>· ${x.q}</small>`:''}</div>
+ <div class="spec">${x.a} m² · ${x.l?x.l+' m² terrain':'terrain ?'} · ${x.b} ch${x.be?' (estimé)':''} · ${x.r} pièces${x.dpe?' · DPE '+x.dpe:''}${x.y?' · '+x.y:''}</div>
+ <div class="badges">${badges(x)}</div>
+ <div class="dist"><span class="pill ${x.dc}">${{pied:'À pied',court:'Proche',voiture:'Voiture',loin:'Plus loin',inconnue:'À vérifier'}[x.dc]}</span><span class="${x.de?'est':''}">${x.dl}</span></div>
+ ${x.nt?`<div class="exr" style="color:var(--mute)">Note: ${x.nt}</div>`:''}${x.ex?`<div class="exr">Exclu par vos règles: ${x.ex}</div>`:''}<div class="links">${linksHtml(x)}</div>${gapHtml(x)}</div>
+ <div class="act"><button class="l" aria-pressed="${s==='like'}" data-a="like">Intéressé</button><button class="r" aria-pressed="${s==='rej'}" data-a="rej">Rejeter</button></div>
+ <div class="extra"><div class="hist">Prix: ${hs}${x.pub?' · publié le '+new Date(x.pub).toLocaleDateString('fr-FR'):''}</div>
+ ${o.n?`<div class="onote"><b>Note de ${NAMES[O()]}:</b> ${esc(o.n)}</div>`:''}<textarea class="note" id="n-${x.k}" rows="1" placeholder="Ma note (visite, questions, vérifications)">${(m.n||'').replace(/</g,'&lt;')}</textarea></div>`;
+ return d}
+function dvHtml(x,dd,s,os){const oN=NAMES[O()];const o=[];
+ dd.forEach(c=>{
+  if(c==='conf')o.push(`<span class="dv conf">⚠ Désaccord: ${s==='like'?`tu es ${ints(U)}, ${oN} a rejeté ce bien`:`${oN} est ${ints(O())}, tu l'as rejeté`} — à discuter</span>`);
+  else if(c==='attn')o.push(`<span class="dv attn">${oN} est ${ints(O())}: à toi de trancher</span>`);
+  else if(c==='wait')o.push(`<span class="dv wait">En attente de l'avis de ${oN}</span>`);
+  else if(c==='both')o.push(`<span class="dv both">★ Intéressés tous les deux</span>`);
+  else if(c==='excl')o.push(`<span class="dv excl">⚠ Jugé intéressant mais exclu par les règles: ${esc(x.ex)}</span>`)});
+ return o.join('')}
+function alerts(){const el=$('alerts');if(!U){el.innerHTML='';return}
+ let c=0,e=0,a=0,b=0;L.forEach(x=>{const d=dv(x);if(d.includes('conf'))c++;if(d.includes('excl'))e++;if(d.includes('attn'))a++;if(d.includes('both'))b++});
+ const h=[];if(c+e)h.push(`<button class="al conf" data-setst="div">⚠ ${c+e} à discuter${e?` (dont ${e} exclu${e>1?'s':''} par les règles)`:''}</button>`);
+ if(a)h.push(`<button class="al oth ${O()}" data-setst="oth">♥ ${a} coup${a>1?'s':''} de cœur de ${NAMES[O()]} à regarder</button>`);
+ if(b)h.push(`<button class="al both" data-setst="both">★ ${b} commun${b>1?'s':''}</button>`);
+ el.innerHTML=h.join('')}
+function renderLast(){const el=$('last');const fin=meta.finished||SCAN;const hasTime=String(fin).includes('T');const d=new Date(fin);
+ const ok=!isNaN(d);const f=ok?d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+(hasTime?' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):''):'date inconnue';
+ const age=ok?(Date.now()-d.getTime())/36e5:0;const stale=ok&&age>36;
+ el.className=stale?'stale':'';el.textContent='Dernière relève des annonces: '+f+(stale?' (ancienne)':'');
+ $('scan').textContent=ok?d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'';
+ const src=$('srcs');if(src)src.innerHTML=(meta.sources||[]).length?'<b>État des sources à la dernière relève.</b><ul>'+meta.sources.map(s=>`<li>${esc(s.n)}: ${s.st==='ok'?'relevé':s.st==='bloque'?'bloqué (non relevé)':'injoignable'}${s.d?' le '+new Date(s.d).toLocaleDateString('fr-FR'):''}</li>`).join('')+'</ul>':''}
+function renderScan(){renderLast();const el=$('scanp');const s=scanSt;
+ if(s&&s.state==='running'){const p=s.total?Math.round(100*(s.done||0)/s.total):0;el.hidden=false;el.innerHTML=`<div>Mise à jour des annonces en cours: ${esc(s.label||'')} (${s.done||0}/${s.total||'?'})</div><div class="pgt" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p}"><i style="width:${p}%"></i></div>`}
+ else el.hidden=true}
+function chooseUser(u){U=u;try{localStorage.setItem('veille_u',u)}catch(e){}
+ marks=all[U]=all[U]||{};$('who').hidden=true;
+ const b=$('whoBtn');b.hidden=false;b.innerHTML=`<span class="big" style="background:var(--c${u})">${NAMES[u][0]}</span>${NAMES[u]} · changer`;
+ $('cOth').textContent=`♥ Intérêts de ${NAMES[O()]}`;render()}
+function setSt(v){F.st=v;document.querySelectorAll('#sSt button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));render();window.scrollTo({top:0})}
+function chips(){
+ const g=F.grp;const list=cities.filter(c=>g==='all'||(g==='A'?c==='Nîmes':c!=='Nîmes'));
+ [...F_cities].forEach(c=>{if(!list.includes(c))F_cities.delete(c)});
+ const cnt={};L.forEach(x=>{if(pass(x,true))cnt[x.c]=(cnt[x.c]||0)+1});
+ $('fCity').innerHTML=list.length>1?list.map(c=>`<button class="chip" data-city="${c}" aria-pressed="${F_cities.has(c)}">${c}<small>${cnt[c]||0}</small></button>`).join('')+(F_cities.size?'<button class="chip" data-city="*">Toutes</button>':''):'';
+}
+function render(){chips();alerts();
+ const keep=document.activeElement&&document.activeElement.classList.contains('note')?document.activeElement.id:null;
+ const rows=L.filter(x=>pass(x)).sort(sorter());
+ const el=$('list');el.innerHTML='';
+ if(!rows.length){el.innerHTML='<div class="empty">Aucun bien ne correspond à ces filtres.</div>'}
+ rows.slice(0,200).forEach(x=>el.appendChild(card(x)));
+ const n=Object.values(marks),no=Object.values(all[U?O():'m']||{});
+ $('nx').textContent=L.filter(x=>x.ex).length;
+ $('cnt').textContent=`${rows.length} bien${rows.length>1?'s':''} affiché${rows.length>1?'s':''} sur ${L.length} · ${n.filter(m=>m.s==='like').length} intéressé(s) · ${n.filter(m=>m.s==='rej').length} rejeté(s)`+(U?` · ${no.filter(m=>m.s==='like').length} pour ${NAMES[O()]}`:'')+(rows.length>200?' · 200 premiers':'');
+ if(keep&&$(keep))$(keep).focus()}
+document.addEventListener('click',async e=>{
+ if(e.target.closest('#aboutBtn')){const a=$('about'),b=$('aboutBtn');a.hidden=!a.hidden;b.setAttribute('aria-expanded',String(!a.hidden));return}
+ const wu=e.target.closest('[data-u]');if(wu){chooseUser(wu.dataset.u);return}
+ if(e.target.closest('#whoBtn')){$('who').hidden=false;return}
+ const as=e.target.closest('[data-setst]');if(as){setSt(as.dataset.setst);return}
+ const ch=e.target.closest('[data-city]');
+ if(ch){const c=ch.dataset.city;if(c==='*')F_cities.clear();else if(F_cities.has(c))F_cities.delete(c);else F_cities.add(c);render();return}
+ const seg=e.target.closest('#sGrp button, #sSt button');
+ if(seg){const g=seg.parentElement;g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===seg));F[g.id==='sGrp'?'grp':'st']=seg.dataset.v;render();return}
+ const b=e.target.closest('[data-a]');if(!b||!U)return;
+ const k=b.closest('.it').dataset.k,cur=(marks[k]||{}).s||'',nx=cur===b.dataset.a?'':b.dataset.a;
+ marks[k]=Object.assign({},marks[k],{s:nx});render();save(k,{s:nx})});
+const pend={};
+function save(k,data){const u=U;
+ if(!db){$('st').textContent='Enregistrement indisponible dans cette vue: vos choix ne seront pas conservés.';return}
+ pend[k]=Object.assign(pend[k]||{},data);
+ clearTimeout(pend[k+'_t']);pend[k+'_t']=setTimeout(async()=>{const d=pend[k];delete pend[k];
+  try{await db.doc(COL[u]+'/'+k).set(Object.assign({},all[u][k],{u:Date.now()}));$('st').textContent=''}catch(err){$('st').textContent='Enregistrement refusé: '+(err.message||err.code)}},data.n!==undefined?700:50)}
+document.addEventListener('input',e=>{if(e.target.classList.contains('note')){const k=e.target.closest('.it').dataset.k;marks[k]=Object.assign({},marks[k],{n:e.target.value});save(k,{n:e.target.value})}});
+['fDist','fBd','fSort','tG','tP','tC','tM','tV','tL','tD','tT'].forEach(i=>$(i).addEventListener('change',render));
+['fMax','fAmin','fAmax','tX'].forEach(i=>$(i).addEventListener('change',render));
+try{const lu=localStorage.getItem('veille_u');if(lu&&NAMES[lu]){const sm=document.querySelector('#who [data-u='+lu+'] small');if(sm)sm.textContent='dernier choix sur cet appareil'}}catch(e){}
+const FB={apiKey:"AIzaSyAgbtsYdvoXBYa5s1OR4b2SA7X6RlporWo",authDomain:"veille-maison.firebaseapp.com",databaseURL:"https://veille-maison-default-rtdb.europe-west1.firebasedatabase.app",projectId:"veille-maison",storageBucket:"veille-maison.firebasestorage.app",messagingSenderId:"470695735653",appId:"1:470695735653:web:fdeec57f686fbc0583b18c"};
+function loadScript(src){return new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
+async function openDb(){
+ try{await loadScript('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js');await loadScript('https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js');
+  firebase.initializeApp(FB);const rdb=firebase.database();const ref=p=>rdb.ref('veille/'+p);
+  const clean=o=>JSON.parse(JSON.stringify(o));
+  return{collection:n=>({onSnapshot:(cb,er)=>ref(n).on('value',s=>{const v=s.val()||{};cb({docs:Object.entries(v).map(([id,d])=>({id,data:()=>d}))})},e=>er&&er({code:e.code||'erreur'}))}),
+   doc:p=>({set:d=>ref(p).set(clean(d)),onSnapshot:(cb,er)=>ref(p).on('value',s=>cb({exists:s.exists(),data:()=>s.val()}),e=>er&&er(e))})}
+ }catch(e){console.log("DBERR "+(e&&e.message||e));return null}}
+async function getJson(p){const r=await fetch(p+'?v='+Date.now());if(!r.ok)throw new Error(p);return r.json()}
+async function boot(){
+ try{const[l,p,m]=await Promise.all([getJson('data/listings.json'),getJson('data/prices.json'),getJson('data/meta.json').catch(()=>({}))]);L=l;prices=p;meta=m;if(p.scan)SCAN=p.scan}
+ catch(e){$('st').textContent='Impossible de charger les annonces. Rechargez la page.';return}
+ mkCities();renderLast();render();
+ 
+ db=await openDb()
+ if(!db){$('st').textContent='Connexion à la base de suivi impossible: vos choix ne seront pas enregistrés. Vérifiez la connexion et rechargez.';return}
+ const t=setTimeout(()=>{$('st').textContent='Base de suivi lente à répondre, les données affichées peuvent être en retard.'},10000);
+ ['m','j'].forEach(p=>db.collection(COL[p]).onSnapshot(s=>{clearTimeout(t);const o={};s.docs.forEach(d=>o[d.id]=d.data());
+  const ae=document.activeElement;if(p===U&&ae&&ae.classList&&ae.classList.contains('note')){const kk=ae.closest('.it').dataset.k;if(o[kk])o[kk]=Object.assign({},o[kk],{n:marks[kk]&&marks[kk].n!==undefined?marks[kk].n:o[kk].n})}
+  all[p]=o;if(p===U)marks=o;render()},e=>{clearTimeout(t);$('st').textContent='Suivi indisponible ('+e.code+').'}));
+ db.doc('scan/status').onSnapshot(s=>{scanSt=s.exists?s.data():null;renderScan()},()=>{});
+}
+boot();
+</script>
+</body>
+</html>
