@@ -194,7 +194,9 @@ let U=null,all={m:{},j:{}};
 const O=()=>U==='m'?'j':'m';
 const om=k=>(all[O()]||{})[k]||{};
 const ints=p=>FEM[p]?'intéressée':'intéressé';
-const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl=u=>/^https?:\/\//i.test(String(u))?esc(u):'#';
+const num=n=>{n=Number(n);return isFinite(n)?n:0};
 function dv(x){const r=[];if(!U)return r;const a=(marks[x.k]||{}).s||'',b=om(x.k).s||'';
  if(a==='like'&&b==='like')r.push('both');
  else if((a==='like'&&b==='rej')||(a==='rej'&&b==='like'))r.push('conf');
@@ -228,7 +230,7 @@ function sorter(){const v=$('fSort').value;const t=x=>trend(x);
  return {p:(a,b)=>t(a).last-t(b).last,pd:(a,b)=>t(b).last-t(a).last,drop:(a,b)=>t(a).diff-t(b).diff,new:(a,b)=>(b.pub||b.mod).localeCompare(a.pub||a.mod),dist:(a,b)=>DR[a.dc]-DR[b.dc]||t(a).last-t(b).last,a:(a,b)=>b.a-a.a}[v]}
 const HOUSE2='<svg viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M1 7l4.5-4.5L10 7v6H1zM10 7l4.5-4.5L19 7v6h-9"/></svg>';
 function badges(x){const o=[];
- o.push(x.g==='o'?`<span class="b y">Garage${x.gm?' '+x.gm+' m²':''}</span>`:`<span class="b w">Garage non confirmé</span>`);
+ o.push(x.g==='o'?`<span class="b y">Garage${x.gm?' '+num(x.gm)+' m²':''}</span>`:`<span class="b w">Garage non confirmé</span>`);
  if(x.pi==='o')o.push('<span class="b y">Piscine</span>');else if(x.pi==='p')o.push('<span class="b">Piscine possible</span>');
  if(x.cl)o.push('<span class="b y">Clim</span>');if(x.ca)o.push('<span class="b y">Cave / sous-sol</span>');
  o.push(x.mi==='n'?'<span class="b y">Non mitoyenne</span>':x.mi==='o'?'<span class="b n">Mitoyenne</span>':'<span class="b n">Mitoyenneté ?</span>');
@@ -240,7 +242,7 @@ function badges(x){const o=[];
  if(x.tr==='l')o.push('<span class="b w">Rafraîchissement</span>');if(x.pa)o.push('<span class="b">Particulier</span>');
  return o.join('')}
 function lowInfo(x){const ps=x.u.map(u=>u[2]).filter(Boolean);if(ps.length<2)return null;const mn=Math.min(...ps),mx=Math.max(...ps);return mn===mx?null:{mn,mx}}
-function linksHtml(x){const li=lowInfo(x);return x.u.map(u=>{const low=li&&u[2]===li.mn;return `<span class="lk${low?' low':''}"><a href="${u[1]}" target="_blank" rel="noopener">${u[0]}</a>${u[2]?`<span class="pp">${eur(u[2])}</span>`:''}${low?'<span class="cheap" title="Prix affiché le plus bas parmi les plateformes relevées">▼ moins cher</span>':''}</span>`}).join('')}
+function linksHtml(x){const li=lowInfo(x);return x.u.map(u=>{const low=li&&u[2]===li.mn;return `<span class="lk${low?' low':''}"><a href="${safeUrl(u[1])}" target="_blank" rel="noopener noreferrer">${esc(u[0])}</a>${u[2]?`<span class="pp">${eur(u[2])}</span>`:''}${low?'<span class="cheap" title="Prix affiché le plus bas parmi les plateformes relevées">▼ moins cher</span>':''}</span>`}).join('')}
 function gapHtml(x){const li=lowInfo(x);return li?`<div class="gap">Écart entre plateformes: ${eur(li.mx-li.mn)} (de ${eur(li.mn)} à ${eur(li.mx)})</div>`:''}
 function card(x){
  const m=marks[x.k]||{},s=m.s||'',t=trend(x),o=om(x.k),os=o.s||'',dd=dv(x);
@@ -248,11 +250,11 @@ function card(x){
  const hs=t.h.map(h=>`${h[0]?new Date(h[0]).toLocaleDateString('fr-FR'):'ancien prix affiché (date inconnue)'} ${eur(h[1])}`).join(' → ');
  const d=document.createElement('div');d.className='it '+s+(x.st?' sold':'')+(x.ex?' exc':'')+(os==='like'?' o-'+O():'')+(dd.includes('both')?' both':'')+(dd.includes('conf')?' cf':'');d.dataset.k=x.k;
  d.innerHTML=`${dd.length?`<div class="dvb">${dvHtml(x,dd,s,os)}</div>`:''}${x.st?`<div class="sbar">${x.st==='vendu'?'Vendu':'Sous compromis / sous offre'}: ne plus compter dessus</div>`:''}<div class="price-col"><div class="price">${eur(t.last)}</div>${drop}</div>
- <div class="main"><div class="loc">${x.c}${U?`<span class="who">${av(U,s)}${av(O(),os)}</span>`:''}${x.q&&x.q!==x.c?` <small>· ${x.q}</small>`:''}</div>
- <div class="spec">${x.a} m² · ${x.l?x.l+' m² terrain':'terrain ?'} · ${x.b} ch${x.be?' (estimé)':''} · ${x.r} pièces${x.dpe?' · DPE '+x.dpe:''}${x.y?' · '+x.y:''}</div>
+ <div class="main"><div class="loc">${esc(x.c)}${U?`<span class="who">${av(U,s)}${av(O(),os)}</span>`:''}${x.q&&x.q!==x.c?` <small>· ${esc(x.q)}</small>`:''}</div>
+ <div class="spec">${num(x.a)} m² · ${x.l?num(x.l)+' m² terrain':'terrain ?'} · ${num(x.b)} ch${x.be?' (estimé)':''} · ${num(x.r)} pièces${x.dpe?' · DPE '+esc(x.dpe):''}${x.y?' · '+num(x.y):''}</div>
  <div class="badges">${badges(x)}</div>
- <div class="dist"><span class="pill ${x.dc}">${{pied:'À pied',court:'Proche',voiture:'Voiture',loin:'Plus loin',inconnue:'À vérifier'}[x.dc]}</span><span class="${x.de?'est':''}">${x.dl}</span></div>
- ${x.nt?`<div class="exr" style="color:var(--mute)">Note: ${x.nt}</div>`:''}${x.ex?`<div class="exr">Exclu par vos règles: ${x.ex}</div>`:''}<div class="links">${linksHtml(x)}</div>${gapHtml(x)}</div>
+ <div class="dist"><span class="pill ${esc(x.dc)}">${{pied:'À pied',court:'Proche',voiture:'Voiture',loin:'Plus loin',inconnue:'À vérifier'}[x.dc]}</span><span class="${x.de?'est':''}">${esc(x.dl)}</span></div>
+ ${x.nt?`<div class="exr" style="color:var(--mute)">Note: ${esc(x.nt)}</div>`:''}${x.ex?`<div class="exr">Exclu par vos règles: ${esc(x.ex)}</div>`:''}<div class="links">${linksHtml(x)}</div>${gapHtml(x)}</div>
  <div class="act"><button class="l" aria-pressed="${s==='like'}" data-a="like">Intéressé</button><button class="r" aria-pressed="${s==='rej'}" data-a="rej">Rejeter</button></div>
  <div class="extra"><div class="hist">Prix: ${hs}${x.pub?' · publié le '+new Date(x.pub).toLocaleDateString('fr-FR'):''}</div>
  ${o.n?`<div class="onote"><b>Note de ${NAMES[O()]}:</b> ${esc(o.n)}</div>`:''}<textarea class="note" id="n-${x.k}" rows="1" placeholder="Ma note (visite, questions, vérifications)">${(m.n||'').replace(/</g,'&lt;')}</textarea></div>`;
@@ -278,7 +280,7 @@ function renderLast(){const el=$('last');const fin=meta.finished||SCAN;const has
  $('scan').textContent=ok?d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}):'';
  const src=$('srcs');if(src)src.innerHTML=(meta.sources||[]).length?'<b>État des sources à la dernière relève.</b><ul>'+meta.sources.map(s=>`<li>${esc(s.n)}: ${s.st==='ok'?'relevé':s.st==='bloque'?'bloqué (non relevé)':'injoignable'}${s.d?' le '+new Date(s.d).toLocaleDateString('fr-FR'):''}</li>`).join('')+'</ul>':''}
 function renderScan(){renderLast();const el=$('scanp');const s=scanSt;
- if(s&&s.state==='running'){const p=s.total?Math.round(100*(s.done||0)/s.total):0;el.hidden=false;el.innerHTML=`<div>Mise à jour des annonces en cours: ${esc(s.label||'')} (${s.done||0}/${s.total||'?'})</div><div class="pgt" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p}"><i style="width:${p}%"></i></div>`}
+ if(s&&s.state==='running'){const p=s.total?Math.max(0,Math.min(100,Math.round(100*num(s.done)/num(s.total)))):0;el.hidden=false;el.innerHTML=`<div>Mise à jour des annonces en cours: ${esc(s.label||'')} (${num(s.done)}/${s.total?num(s.total):'?'})</div><div class="pgt" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${p}"><i style="width:${p}%"></i></div>`}
  else el.hidden=true}
 function chooseUser(u){U=u;try{localStorage.setItem('veille_u',u)}catch(e){}
  marks=all[U]=all[U]||{};$('who').hidden=true;
@@ -289,7 +291,7 @@ function chips(){
  const g=F.grp;const list=cities.filter(c=>g==='all'||(g==='A'?c==='Nîmes':c!=='Nîmes'));
  [...F_cities].forEach(c=>{if(!list.includes(c))F_cities.delete(c)});
  const cnt={};L.forEach(x=>{if(pass(x,true))cnt[x.c]=(cnt[x.c]||0)+1});
- $('fCity').innerHTML=list.length>1?list.map(c=>`<button class="chip" data-city="${c}" aria-pressed="${F_cities.has(c)}">${c}<small>${cnt[c]||0}</small></button>`).join('')+(F_cities.size?'<button class="chip" data-city="*">Toutes</button>':''):'';
+ $('fCity').innerHTML=list.length>1?list.map(c=>`<button class="chip" data-city="${esc(c)}" aria-pressed="${F_cities.has(c)}">${esc(c)}<small>${cnt[c]||0}</small></button>`).join('')+(F_cities.size?'<button class="chip" data-city="*">Toutes</button>':''):'';
 }
 function render(){chips();alerts();
  const keep=document.activeElement&&document.activeElement.classList.contains('note')?document.activeElement.id:null;
