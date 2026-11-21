@@ -20,32 +20,32 @@
   "st": "bloque"
  },
  "PAP": {
-  "m": "htmlSource sur pap.fr",
-  "st": "a valider"
+  "m": "ids g: Nîmes 43630, Caissargues 18424, Bouillargues 18500, Redessan 18470, Rodilhan 18529, Garons 18436, Manduel 18452, Générac 18659. URL /annonce/vente-maisons-<ville>-g<id>-jusqu-a-400000-euros-a-partir-de-90-m2-{p}, linkRe ^/annonces/maison-, ville tirée de l'URL. delay 2500 ms (429 sinon).",
+  "st": "ok 2026-11-21"
  },
  "Properstar": {
-  "m": "/france/nimes/acheter/maison-villa?p=n (55 pages)",
-  "st": "a valider"
+  "m": "htmlSource /france/nimes/acheter/maison-villa?p={p}, 60 pages, linkRe ^/annonce/\\d+, ville cherchée dans le texte de la carte. Beaucoup de terrains/fiches sans chambres : n'importer que b>=3, surface>=90, prix>=120k.",
+  "st": "ok 2026-11-21"
  },
  "Orpi": {
-  "m": "htmlSource",
-  "st": "a valider"
+  "m": "page de recherche rendue par JS : URL avec locations[0..8] (nimes, caissargues, bouillargues, redessan, rodilhan, garons, manduel, bellegarde, generac), maxPrice=400000, minSurface=90 ; lire les cartes dans le DOM, cliquer sur les pages 2,3 ; puis VH.delta.",
+  "st": "ok 2026-11-21"
  },
  "Laforêt": {
-  "m": "htmlSource",
-  "st": "a valider"
+  "m": "htmlSource sur /agence-immobiliere/nimes/acheter, linkRe /acheter/<ville>/maison-...-\\d{7,}$",
+  "st": "ok 2026-11-21"
  },
  "Century 21": {
-  "m": "htmlSource",
-  "st": "a valider"
+  "m": "/annonces/f/achat-maison/cp-<cp>/s-0-/st-0-/b-0-400000/ (statut 410 = aucun résultat ; 30000, 30900, 30127, 30129, 30230, 30510), linkRe /trouver_logement/detail/",
+  "st": "ok 2026-11-21"
  },
  "Logic-Immo": {
-  "m": "htmlSource",
-  "st": "a valider"
+  "m": "/classified-search?distributionTypes=Buy&estateTypes=House&locations=AD08FR11815,AD08FR11689,AD08FR11676,AD08FR11663,AD08FR11754&priceMax=400000&spaceMin=90&page={p} (Nîmes, Caissargues, Bouillargues, Bellegarde + 1). Manquent Redessan, Manduel, Garons, Générac : ajouter leurs identifiants via le champ lieu du site. Refuser les cookies non essentiels.",
+  "st": "ok partiel 2026-11-21"
  },
  "Notaires": {
-  "m": "immonot / notaires.fr via htmlSource",
-  "st": "a valider"
+  "m": "immonot.com, CSP interdit toute requête vers un autre domaine : collecter dans la page sans VH.load (coller le code de collecte, lignes pipe), /immobilier-notaire/annonces/D30/gard.html?page=n",
+  "st": "ok 2026-11-21"
  },
  "Interkab": {
   "m": "/immobilier-<cp>-<ville>/annonces?type=1-maison&page=n",

@@ -13,7 +13,7 @@ TODAY=args[args.index('--date')+1] if '--date' in args else datetime.date.today(
 DRY='--dry' in args
 L=json.load(open(D('data/listings.json')));P=json.load(open(D('data/prices.json')));M=json.load(open(D('data/meta.json')))
 DRIVE={'Caissargues':10,'Bouillargues':12,'Rodilhan':15,'Garons':15,'Redessan':15,'Manduel':15,'Générac':20,'Bellegarde':25}
-PFX={"Bien'ici":'bi','Leboncoin':'lbc','SeLoger':'sl','Orpi':'orpi','AVendreALouer':'av','PAP':'pap','Notaires':'notaires'}
+PFX={"Bien'ici":'bi','Leboncoin':'lbc','SeLoger':'sl','Orpi':'orpi','AVendreALouer':'av','PAP':'pap','Notaires':'notaires','Properstar':'ps','Laforêt':'laf','Century 21':'c21','Logic-Immo':'li'}
 QD={}
 for x in L:
     if x.get('q') and x.get('de') and (x['c'],x['q']) not in QD: QD[(x['c'],x['q'])]=(x['dc'],x['dl'])
@@ -92,7 +92,7 @@ for fn in files:
             elif k=='vi':notes.append(f"VIAGER possible: {x['k']} {x['c']}")
     seen.update(d['seen']);seen.update(i for i,*_ in d['lk'])
     for n in d['nw']:
-        f=dict(ca=0,lg=0,g='?',pi='n',cl=0,mi='?',bu=0,pl=0,p2=0,tr='n',jd=0,vi=0,ms=0,ur=0,rx=0);f.update(n['f']);c=n['c'];k=PFX.get(n['s'],n['s'][:3].lower())+'-'+n['id'].replace('/','_')
+        f=dict(ca=0,lg=0,g='?',pi='n',cl=0,mi='?',bu=0,pl=0,p2=0,tr='n',jd=0,vi=0,ms=0,ur=0,rx=0);f.update(n['f']);c=n['c'];k=PFX.get(n['s'],n['s'][:3].lower())+'-'+n['id'].replace('/','_').lstrip('_').replace('annonce_','')
         if any(x['k']==k for x in L):continue
         j=fuzzy(c,n)
         if j is not None:

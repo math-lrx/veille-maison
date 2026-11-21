@@ -18,4 +18,4 @@ Acteurs : Mathieu lance ; Claude (app de bureau, conversation liée à l'ordinat
 
 ## Sources
 Voir `sources.json` : méthode par site et statut du dernier essai.
-Dernier passage complet validé (2026-11-21) : Bien'ici, Leboncoin, AVendreALouer. Les autres sites ont une méthode listée mais restent à (re)valider à chaque relève ; un site non scanné garde sa date précédente affichée dans « À propos ».
+Relève du 2026-11-21 : Bien'ici, Leboncoin, AVendreALouer, PAP, Properstar, Notaires, Orpi, Laforêt, Century 21, Logic-Immo (partiel). Restent à valider : agences locales ; bloqués : SeLoger (403), ParuVendu (limite de débit). Un site non scanné garde sa date précédente affichée dans « À propos ».
