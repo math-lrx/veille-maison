@@ -49,8 +49,10 @@ function parse(t){t=String(t||'').replace(/[\s\u00a0\u202f]+/g,' ');const o={};l
  m=t.match(/(\d+)\s*pi[èe]ces?/i);o.r=m?+m[1]:0;m=t.match(/(\d+)\s*chambres?/i);o.b=m?+m[1]:0;
  m=t.match(/(?:terrain|parcelle|jardin)[^\d]{0,25}(\d[\d ]{1,6})\s*m(?:²|2)/i)||t.match(/(\d[\d ]{1,6})\s*m(?:²|2)\s*(?:de\s+)?(?:terrain|jardin|parcelle)/i);o.l=m?num(m[1]):0;return o}
 /* cfg: {name, base?, urls:[ 'https://.../liste?p={p}' ... ] (ou chemins relatifs), pages:N, linkRe: RegExp, city?:(url,text)=>nom, detail?:true, max?:40} */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function pf(u,cfg){const d=cfg.delay||0;if(d)await sleep(d);let r=await fetch(u);if(r.status===429){await sleep(45000);r=await fetch(u)}return r}
 async function htmlSource(cfg){const L=await load(),K=window.VH_K;const seenUrl=new Set(),cand=[];
- for(const tpl of cfg.urls){for(let p=cfg.p0===undefined?1:cfg.p0;p<(cfg.p0===undefined?1:cfg.p0)+(cfg.pages||1);p++){let html;try{const r=await fetch(tpl.replace('{p}',p));if(!r.ok){cand.push({err:r.status+' '+tpl});break}html=await r.text()}catch(e){cand.push({err:'ERR '+tpl});break}
+ for(const tpl of cfg.urls){for(let p=cfg.p0===undefined?1:cfg.p0;p<(cfg.p0===undefined?1:cfg.p0)+(cfg.pages||1);p++){let html;try{const r=await pf(tpl.replace('{p}',p),cfg);if(!r.ok){cand.push({err:r.status+' '+tpl});break}html=await r.text()}catch(e){cand.push({err:'ERR '+tpl});break}
   const d=new DOMParser().parseFromString(html,'text/html');let n=0;
   d.querySelectorAll('a[href]').forEach(a=>{let h=a.getAttribute('href');if(!cfg.linkRe.test(h))return;const url=new URL(h,tpl.startsWith('http')?tpl:location.origin+tpl).href.replace(/[?#].*$/,'');if(seenUrl.has(url))return;seenUrl.add(url);n++;
    let c=a;for(let k=0;k<6&&c.parentElement;k++){c=c.parentElement;if(PRICE.test(c.innerText||''))break}const text=(c.innerText||a.innerText||'').replace(/\s+/g,' ').slice(0,400);cand.push({url,text,t:text})});
@@ -59,7 +61,7 @@ async function htmlSource(cfg){const L=await load(),K=window.VH_K;const seenUrl=
  for(const x of cand){if(x.err)continue;const o=parse(x.text);const r={id:x.url.replace(/^https?:\/\/[^/]+/,'').replace(/[^A-Za-z0-9]+/g,'_').slice(-40),url:x.url,c:(cfg.city?cfg.city(x.url,x.text):x.text)||'',p:o.p,a:o.a,l:o.l,r:o.r,b:o.b,t:x.text,d:''};recs.push(r)}
  /* détail pour les candidats inconnus */
  let det=0;for(const r of recs){const c=cityOf(r.c)||cityOf(r.t)||cityOf(r.url);if(c)r.c=c;if(!r.p||r.p>400000||!cityOf(r.c))continue;if(K[pid(r.url)]!==undefined)continue;if(fuzzy(L,r)>=0)continue;if(cfg.detail===false||det>=(cfg.max||40))continue;det++;
-  try{const h=await (await fetch(r.url)).text();const dd=new DOMParser().parseFromString(h,'text/html');dd.querySelectorAll('script,style,nav,footer,header').forEach(e=>e.remove());const s=dd.body.innerText.replace(/[\s\u00a0]+/g,' ');const o=parse(s);r.d=s.slice(0,6000);if(!r.a)r.a=o.a;if(!r.l)r.l=o.l;if(!r.b)r.b=o.b;if(!r.r)r.r=o.r}catch(e){}}
+  try{const h=await (await pf(r.url,cfg)).text();const dd=new DOMParser().parseFromString(h,'text/html');dd.querySelectorAll('script,style,nav,footer,header').forEach(e=>e.remove());const s=dd.body.innerText.replace(/[\s\u00a0]+/g,' ');const o=parse(s);r.d=s.slice(0,6000);if(!r.a)r.a=o.a;if(!r.l)r.l=o.l;if(!r.b)r.b=o.b;if(!r.r)r.r=o.r}catch(e){}}
  const out=await delta(recs,cfg.name);out.errs=errs;out.found=recs.length;return out}
 
 async function leboncoin(){const L=await load(),K=window.VH_K;const cps=['nimes_30000','nimes_30900','caissargues_30132','bouillargues_30230','rodilhan_30230','redessan_30129','manduel_30129','garons_30128','bellegarde_30127','generac_30510'];const recs=[],errs=[];
