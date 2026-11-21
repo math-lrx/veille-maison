@@ -30,14 +30,15 @@ const pid=u=>{const c=canon(u);let m=c.match(/bienici\.com\/annonce\/(.+)$/);if(
 async function load(){if(window.VH_L)return window.VH_L;const L=await (await fetch(PAGES+'data/listings.json?v='+Date.now())).json();const known={};L.forEach((x,i)=>x.u.forEach(u=>{known[pid(u[1])]=i}));window.VH_L=L;window.VH_K=known;return L}
 function fuzzy(L,r){for(let i=0;i<L.length;i++){const x=L[i];if(norm(x.c)!==norm(r.c))continue;const d=Math.abs(x.p-r.p);if(d>1000)continue;if(r.a&&x.a&&Math.abs(x.a-r.a)>3)continue;if(r.l&&x.l&&Math.abs(x.l-r.l)>Math.max(20,.1*x.l))continue;if(!r.a&&!r.l)continue;return i}return -1}
 /* recs: [{id,url,c,p,a,l,r,b,t,d,pub,mod,pool,clim,garden,work,dpe,y,dec}]  -> delta compact */
-async function delta(recs,label){const L=await load(),K=window.VH_K;const out={src:label,n:recs.length,seen:[],chg:[],up:[],lk:[],nw:[],skip:0};
- for(const r of recs){const c=cityOf(r.c);if(!c){out.skip++;continue}r.c=c;if(!r.p||r.p>400000){ if(r.p>400000){let i=K[pid(r.url)];if(i!==undefined)out.chg.push([i,r.p,0]);} out.skip++;continue}
+async function delta(recs,label){const L=await load(),K=window.VH_K;const out={src:label,n:recs.length,seen:[],pp:[],up:[],lk:[],nw:[],skip:0};
+ for(const r of recs){r.p=Array.isArray(r.p)?Math.min(...r.p.map(Number).filter(Boolean)):Number(r.p)||0;const c=cityOf(r.c);if(!c){out.skip++;continue}r.c=c;
   const f=classify((r.t||'')+' . '+(r.d||''),r);let i=K[pid(r.url)];
-  if(i===undefined){i=fuzzy(L,r);if(i>=0){out.lk.push([i,label,r.url,r.p]);K[pid(r.url)]=i}}
-  if(i!==undefined&&i>=0){out.seen.push(i);const x=L[i];const old=(x.u.find(u=>pid(u[1])===pid(r.url))||[])[2];if(x.p!==r.p||(old&&old!==r.p))out.chg.push([i,r.p,old||0]);
-    const up={};if(f.ca&&!x.ca)up.ca=1;if(f.lg>(x.lg||0))up.lg=f.lg;if(Object.keys(up).length)out.up.push([i,up]);continue}
+  if(i===undefined&&r.p&&r.p<=400000){i=fuzzy(L,r);if(i>=0){out.lk.push([i,label,r.url,r.p]);K[pid(r.url)]=i}}
+  if(i!==undefined&&i>=0){out.seen.push(i);const x=L[i];const lkx=x.u.find(u=>pid(u[1])===pid(r.url));if(r.p&&lkx&&lkx[2]!==r.p)out.pp.push([i,r.url,r.p,lkx[2]||0]);
+    const up={};if(f.ca&&!x.ca)up.ca=1;if(f.lg>(x.lg||0))up.lg=f.lg;if(f.vi)up.vi=1;if(Object.keys(up).length)out.up.push([i,up]);continue}
+  if(!r.p||r.p>400000){out.skip++;continue}
   if((r.a&&r.a<90)||(r.b&&r.b<3))continue;
-  out.nw.push({s:label,id:r.id,url:r.url,c:r.c,p:r.p,a:r.a||0,l:r.l||0,r:r.r||0,b:r.b||0,dpe:r.dpe||'',y:r.y||0,pub:r.pub||'',mod:r.mod||'',dec:r.dec?1:0,f,q:r.q||'',t:String(r.t||'').slice(0,120),d:String(r.d||'').slice(0,700)})}
+  out.nw.push({s:label,id:r.id,url:r.url,c:r.c,p:r.p,a:r.a||0,l:r.l||0,r:r.r||0,b:r.b||0,dpe:r.dpe||'',y:r.y||0,pub:r.pub||'',mod:r.mod||'',dec:r.dec?1:0,q:(r.q||'').slice(0,40),f})}
  out.seen=[...new Set(out.seen)];return out}
 async function bienici(){const Z=[-378685,-378869,-379281,-379895,-378879,-382564,-379898,-384073,-382567];const all=[];
  for(let from=0;from<1000;from+=100){const f={size:100,from,showAllModels:false,filterType:'buy',propertyType:['house'],maxPrice:400000,minArea:90,page:from/100+1,sortBy:'relevance',sortOrder:'desc',onTheMarket:[true],zoneIdsByTypes:{zoneIds:Z}};
