@@ -61,9 +61,18 @@ async function htmlSource(cfg){const L=await load(),K=window.VH_K;const seenUrl=
  let det=0;for(const r of recs){const c=cityOf(r.c)||cityOf(r.t)||cityOf(r.url);if(c)r.c=c;if(!r.p||r.p>400000||!cityOf(r.c))continue;if(K[pid(r.url)]!==undefined)continue;if(fuzzy(L,r)>=0)continue;if(cfg.detail===false||det>=(cfg.max||40))continue;det++;
   try{const h=await (await fetch(r.url)).text();const dd=new DOMParser().parseFromString(h,'text/html');dd.querySelectorAll('script,style,nav,footer,header').forEach(e=>e.remove());const s=dd.body.innerText.replace(/[\s\u00a0]+/g,' ');const o=parse(s);r.d=s.slice(0,6000);if(!r.a)r.a=o.a;if(!r.l)r.l=o.l;if(!r.b)r.b=o.b;if(!r.r)r.r=o.r}catch(e){}}
  const out=await delta(recs,cfg.name);out.errs=errs;out.found=recs.length;return out}
+
+async function leboncoin(){const L=await load(),K=window.VH_K;const cps=['30000','30900','30132','30230','30129','30128','30127','30510'];const recs=[],errs=[];
+ for(const cp of cps){for(let p=1;p<=20;p++){let j;try{const r=await fetch('/cl/ventes_immobilieres/cp_x_'+cp+'/real_estate_type:1/price:0-400000/square:90-max?page='+p);if(!r.ok){errs.push(r.status+' '+cp);break}const h=await r.text();j=JSON.parse(h.match(/<script id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/s)[1]).props.pageProps.searchData}catch(e){errs.push('ERR '+cp+' '+p);break}
+  const ads=j.ads||[];ads.forEach(a=>{const at={};(a.attributes||[]).forEach(x=>at[x.key]=x.value);recs.push({id:String(a.list_id),url:'https://www.leboncoin.fr/ad/ventes_immobilieres/'+a.list_id,c:a.location&&a.location.city,p:a.price&&a.price[0],a:+at.square||0,l:+at.land_plot_surface||0,r:+at.rooms||0,b:0,t:a.subject,d:'',pub:(a.first_publication_date||'').slice(0,10),mod:(a.index_date||'').slice(0,10),dpe:(at.energy_rate||'').toUpperCase(),y:+at.building_year||0,pa:a.owner&&a.owner.type==='private'})});
+  if(p>=(j.max_pages||1)||!ads.length)break}}
+ const uniq=new Map();recs.forEach(r=>uniq.set(r.id,r));const R=[...uniq.values()];let det=0;
+ for(const r of R){const c=cityOf(r.c);if(!c)continue;r.c=c;if(!r.p||r.p>400000)continue;if(K[pid(r.url)]!==undefined||fuzzy(L,r)>=0)continue;if(det++>=40)continue;
+  try{const h=await (await fetch('/ad/ventes_immobilieres/'+r.id)).text();const ad=JSON.parse(h.match(/<script id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/s)[1]).props.pageProps.ad;r.d=String(ad.body||'').slice(0,6000)}catch(e){}}
+ const out=await delta(R,'Leboncoin');out.errs=errs;out.found=R.length;return out}
 async function bienici(){const Z=[-378685,-378869,-379281,-379895,-378879,-382564,-379898,-384073,-382567];const all=[];
  for(let from=0;from<1000;from+=100){const f={size:100,from,showAllModels:false,filterType:'buy',propertyType:['house'],maxPrice:400000,minArea:90,page:from/100+1,sortBy:'relevance',sortOrder:'desc',onTheMarket:[true],zoneIdsByTypes:{zoneIds:Z}};
   const j=await (await fetch('/realEstateAds.json?filters='+encodeURIComponent(JSON.stringify(f)))).json();const ads=j.realEstateAds||[];all.push(...ads);if(from+100>=j.total||!ads.length)break}
  return all.map(a=>({id:a.id,url:'https://www.bienici.com/annonce/'+a.id,c:a.city,p:a.price,a:Math.round(a.surfaceArea||0),l:Math.round(a.landSurfaceArea||0),r:a.roomsQuantity||0,b:a.bedroomsQuantity||0,t:a.title,d:String(a.description||'').replace(/<br\s*\/?>/gi,' '),pub:(a.publicationDate||'').slice(0,10),mod:(a.modificationDate||'').slice(0,10),pool:a.hasPool,clim:a.hasAirConditioning,garden:a.hasGarden,work:a.workToDo,dpe:a.energyClassification||'',y:a.yearOfConstruction||0,dec:a.priceHasDecreased,q:a.district&&a.district.libelle||''}))}
-window.VH={PAGES,CITIES,cityOf,classify,canon,pid,load,delta,bienici,htmlSource,parse,num,norm};
+window.VH={PAGES,CITIES,cityOf,classify,canon,pid,load,delta,bienici,htmlSource,leboncoin,parse,num,norm};
 return 'VH prêt'})();
