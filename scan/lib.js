@@ -1,0 +1,47 @@
+/* Bibliothèque de relève (à exécuter DANS la page d'un site via le navigateur intégré).
+   Chargement:  eval(await (await fetch('https://raw.githubusercontent.com/math-lrx/veille-maison/main/scan/lib.js')).text())
+   (si la politique de sécurité du site l'interdit, coller le fichier tel quel dans l'outil javascript). */
+(function(){
+const PAGES='https://math-lrx.github.io/veille-maison/';
+const CITIES={'nimes':'Nîmes','caissargues':'Caissargues','bouillargues':'Bouillargues','redessan':'Redessan','rodilhan':'Rodilhan','garons':'Garons','manduel':'Manduel','bellegarde':'Bellegarde','generac':'Générac'};
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z]/g,'');
+const cityOf=s=>{const n=norm(s);for(const k in CITIES)if(n.startsWith(k))return CITIES[k];return null};
+const RC=/(?<![a-zà-ÿ])(caves?|caveau|sous[- ]?sols?|semi[- ]?enterr[ée]e?s?)(?![a-zà-ÿ])/i;
+const RD=[/(deux|2)\s+(logements?|appartements?|habitations?|maisons?\s+(ind|dist|s[ée]par))/i,/(logement|appartement|studio|t1|t2|f1|f2|gîte|gite)\s+(totalement\s+|enti[èe]rement\s+)?(ind[ée]pendant|attenant|annexe|s[ée]par[ée]|am[ée]nag[ée]|en\s+rez)/i,/\bstudio\b/i,/\b(gîte|gite)s?\b/i,/(rez[- ]de[- ]chauss[ée]e|rdc)\s+et\s+(l['’]\s*)?[ée]tage\s+(sont\s+|est\s+)?ind[ée]pendants?/i,/(deux|2)\s+entr[ée]es\s+ind[ée]pendantes?/i,/entr[ée]e\s+ind[ée]pendante/i,/(second|deuxi[èe]me|2[èe]?me|2nd)\s+logement/i,/logement\s+(annexe|d['’]amis|de\s+fonction|locatif)|maison\s+d['’]amis|appartement\s+d['’]amis/i,/(d[ée]pendance|annexe|pool[- ]?house)\s+(am[ée]nag[ée]e?|habitable|transform[ée]e?)/i,/plusieurs\s+logements|deux\s+habitations|double\s+habitation|duplex\s+ind[ée]pendant/i];
+const POT=/possibilit|pourr|peut|peuvent|permett|envisag|cr[ée]er|cr[ée]ation|potentiel|projet|selon|id[ée]al pour|ais[ée]ment|transform|am[ée]nager en|divis/i;
+function classify(t,o){o=o||{};t=String(t||'');const f={};
+ f.ca=RC.test(t)?1:0;
+ let lg=0;for(const r of RD){const m=t.match(r);if(m){const ctx=t.slice(Math.max(0,m.index-80),m.index+m[0].length+80);lg=Math.max(lg,POT.test(ctx)?1:2)}}f.lg=lg;
+ f.g=/(sans|pas de|aucun)\s+garage/i.test(t)?'?':(/garage|box\s+ferm/i.test(t)||o.garage)?'o':'?';
+ f.pi=(o.pool||/piscine/i.test(t))?((/(possibilit[ée]|projet|emplacement|pr[ée]vu|installer|construire|cr[ée]er)[^.]{0,50}piscine|piscine[^.]{0,40}(possible|envisageable|[àa] construire|en projet)/i.test(t)&&!o.pool)?'p':'o'):'n';
+ f.cl=(o.clim||/climatisation|climatis[ée]|\bclim\b|r[ée]versible/i.test(t))?1:0;
+ f.mi=/(non|pas|sans|aucune?)[ -]+(de\s+)?mitoyen|ind[ée]pendante?\b|4 fa[çc]ades|quatre fa[çc]ades|aucun vis[- ]?[àa][- ]?vis/i.test(t)?'n':/mitoyen|jumel/i.test(t)?'o':'?';
+ f.bu=/bureau/i.test(t)?1:0;f.pl=/plain[- ]?pied/i.test(t)?1:0;
+ f.p2=/(deux|2|plusieurs|double)\s+(places?\s+de\s+(parking|stationnement)|garages?|parkings?|v[ée]hicules?)|double garage|garage double/i.test(t)?1:0;
+ f.tr=(o.work||(/travaux|r[ée]nover|r[ée]novation|rafra[iî]chir|remise au go[uû]t|[àa] r[ée]habiliter/i.test(t)&&!/(aucun|sans|pas de)\s+travaux/i.test(t)))?'l':'n';
+ f.jd=/jardin|terrain\s+(clos|arbor|plat)|parcelle|pelouse/i.test(t)||o.garden?1:0;
+ f.vi=/viager|nue[- ]propri[ée]t[ée]/i.test(t)?1:0;
+ f.ms=/\bpermis de construire\b[^.]{0,40}(non|sans)|terrain\s+[àa]\s+b[âa]tir|projet de construction|maison [àa] construire|vente en l['’]?[ée]tat futur|VEFA/i.test(t)?1:0;
+ f.ur=/maison de (ville|village)|village house|centre[- ]ville|centre[- ]village|ruelle/i.test(t)?1:0;
+ return f}
+const canon=u=>{u=String(u||'').replace(/^https?:\/\/(www\.)?/i,'').replace(/[?#].*$/,'').replace(/\/$/,'').toLowerCase();return u};
+const num=s=>{const m=String(s||'').replace(/[\s  ]/g,'').match(/\d+/);return m?+m[0]:0};
+const pid=u=>{const c=canon(u);let m=c.match(/bienici\.com\/annonce\/(.+)$/);if(m)return 'bi:'+m[1];m=c.match(/leboncoin\.fr\/(?:ad\/[a-z_]+\/)?(\d+)/);if(m)return 'lbc:'+m[1];m=c.match(/seloger\.com\/annonces?\/.*\/([0-9a-z]{8,})$/);if(m)return 'sl:'+m[1];m=c.match(/fd-(\d+)$/);if(m)return 'av:'+m[1];return c};
+async function load(){if(window.VH_L)return window.VH_L;const L=await (await fetch(PAGES+'data/listings.json?v='+Date.now())).json();const known={};L.forEach((x,i)=>x.u.forEach(u=>{known[pid(u[1])]=i}));window.VH_L=L;window.VH_K=known;return L}
+function fuzzy(L,r){for(let i=0;i<L.length;i++){const x=L[i];if(norm(x.c)!==norm(r.c))continue;const d=Math.abs(x.p-r.p);if(d>1000)continue;if(r.a&&x.a&&Math.abs(x.a-r.a)>3)continue;if(r.l&&x.l&&Math.abs(x.l-r.l)>Math.max(20,.1*x.l))continue;if(!r.a&&!r.l)continue;return i}return -1}
+/* recs: [{id,url,c,p,a,l,r,b,t,d,pub,mod,pool,clim,garden,work,dpe,y,dec}]  -> delta compact */
+async function delta(recs,label){const L=await load(),K=window.VH_K;const out={src:label,n:recs.length,seen:[],chg:[],up:[],lk:[],nw:[],skip:0};
+ for(const r of recs){const c=cityOf(r.c);if(!c){out.skip++;continue}r.c=c;if(!r.p||r.p>400000){ if(r.p>400000){let i=K[pid(r.url)];if(i!==undefined)out.chg.push([i,r.p,0]);} out.skip++;continue}
+  const f=classify((r.t||'')+' . '+(r.d||''),r);let i=K[pid(r.url)];
+  if(i===undefined){i=fuzzy(L,r);if(i>=0){out.lk.push([i,label,r.url,r.p]);K[pid(r.url)]=i}}
+  if(i!==undefined&&i>=0){out.seen.push(i);const x=L[i];const old=(x.u.find(u=>pid(u[1])===pid(r.url))||[])[2];if(x.p!==r.p||(old&&old!==r.p))out.chg.push([i,r.p,old||0]);
+    const up={};if(f.ca&&!x.ca)up.ca=1;if(f.lg>(x.lg||0))up.lg=f.lg;if(Object.keys(up).length)out.up.push([i,up]);continue}
+  if((r.a&&r.a<90)||(r.b&&r.b<3))continue;
+  out.nw.push({s:label,id:r.id,url:r.url,c:r.c,p:r.p,a:r.a||0,l:r.l||0,r:r.r||0,b:r.b||0,dpe:r.dpe||'',y:r.y||0,pub:r.pub||'',mod:r.mod||'',dec:r.dec?1:0,f,q:r.q||'',t:String(r.t||'').slice(0,120),d:String(r.d||'').slice(0,700)})}
+ out.seen=[...new Set(out.seen)];return out}
+async function bienici(){const Z=[-378685,-378869,-379281,-379895,-378879,-382564,-379898,-384073,-382567];const all=[];
+ for(let from=0;from<1000;from+=100){const f={size:100,from,showAllModels:false,filterType:'buy',propertyType:['house'],maxPrice:400000,minArea:90,page:from/100+1,sortBy:'relevance',sortOrder:'desc',onTheMarket:[true],zoneIdsByTypes:{zoneIds:Z}};
+  const j=await (await fetch('/realEstateAds.json?filters='+encodeURIComponent(JSON.stringify(f)))).json();const ads=j.realEstateAds||[];all.push(...ads);if(from+100>=j.total||!ads.length)break}
+ return all.map(a=>({id:a.id,url:'https://www.bienici.com/annonce/'+a.id,c:a.city,p:a.price,a:Math.round(a.surfaceArea||0),l:Math.round(a.landSurfaceArea||0),r:a.roomsQuantity||0,b:a.bedroomsQuantity||0,t:a.title,d:String(a.description||'').replace(/<br\s*\/?>/gi,' '),pub:(a.publicationDate||'').slice(0,10),mod:(a.modificationDate||'').slice(0,10),pool:a.hasPool,clim:a.hasAirConditioning,garden:a.hasGarden,work:a.workToDo,dpe:a.energyClassification||'',y:a.yearOfConstruction||0,dec:a.priceHasDecreased,q:a.district&&a.district.libelle||''}))}
+window.VH={PAGES,CITIES,cityOf,classify,canon,pid,load,delta,bienici,num,norm};
+return 'VH prêt'})();
