@@ -1,0 +1,62 @@
+{
+ "Bien'ici": {
+  "m": "VH.bienici()",
+  "st": "ok 2026-11-21"
+ },
+ "Leboncoin": {
+  "m": "VH.leboncoin() sur onglet leboncoin.fr",
+  "st": "ok 2026-11-21"
+ },
+ "AVendreALouer": {
+  "m": "VH.htmlSource, CSP sans eval: coller lib.min.js",
+  "st": "ok 2026-11-21"
+ },
+ "SeLoger": {
+  "m": "liste en 403",
+  "st": "bloque"
+ },
+ "ParuVendu": {
+  "m": "limite de débit",
+  "st": "bloque"
+ },
+ "PAP": {
+  "m": "htmlSource sur pap.fr",
+  "st": "a valider"
+ },
+ "Properstar": {
+  "m": "/france/nimes/acheter/maison-villa?p=n (55 pages)",
+  "st": "a valider"
+ },
+ "Orpi": {
+  "m": "htmlSource",
+  "st": "a valider"
+ },
+ "Laforêt": {
+  "m": "htmlSource",
+  "st": "a valider"
+ },
+ "Century 21": {
+  "m": "htmlSource",
+  "st": "a valider"
+ },
+ "Logic-Immo": {
+  "m": "htmlSource",
+  "st": "a valider"
+ },
+ "Notaires": {
+  "m": "immonot / notaires.fr via htmlSource",
+  "st": "a valider"
+ },
+ "Interkab": {
+  "m": "/immobilier-<cp>-<ville>/annonces?type=1-maison&page=n",
+  "st": "a valider"
+ },
+ "Agences locales": {
+  "m": "Montaury, Moreira, Capitelles, Tissot, Atrium, Conception Immo, Cabinet Agir, Grand Nîmes, H4, Agence du Midi, Immoregard, Ceres, MPC, Patrimoine Habitat, Ici et Là, Bienveo, ImmoPlanète, Accent du Sud : htmlSource",
+  "st": "a valider"
+ },
+ "Injoignables connus": {
+  "m": "Immobilier Manduel, Vaunage, Marguerittes, Pont-du-Gard, Méridional, Kyero, PLH, Calini, Immo-Diffusion, AD Immo, Set Immo, Pierres au Soleil, Maisons-Appartements",
+  "st": "bloque/injoignable"
+ }
+}
