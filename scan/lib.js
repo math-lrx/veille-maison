@@ -70,9 +70,14 @@ async function leboncoin(){const L=await load(),K=window.VH_K;const cps=['nimes_
  for(const r of R){const c=cityOf(r.c);if(!c)continue;r.c=c;if(!r.p||r.p>400000)continue;if(K[pid(r.url)]!==undefined||fuzzy(L,r)>=0)continue;if(det++>=40)continue;
   try{const h=await (await fetch('/ad/ventes_immobilieres/'+r.id)).text();const ad=JSON.parse(h.match(/<script id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/s)[1]).props.pageProps.ad;r.d=String(ad.body||'').slice(0,6000)}catch(e){}}
  const out=await delta(R,'Leboncoin');out.errs=errs;out.found=R.length;return out}
+
+const PFXU={"Bien'ici":'https://www.bienici.com/annonce/','Leboncoin':'https://www.leboncoin.fr/ad/ventes_immobilieres/'};
+function pack(o){const h=JSON.stringify({src:o.src,n:o.n,seen:o.seen.length,pp:o.pp,up:o.up,lk:o.lk.map(x=>[x[0],x[1]==o.src?'':x[1],x[2],x[3]]),errs:o.errs||[],skip:o.skip});
+ const rows=o.nw.map(r=>[r.id,(PFXU[r.s]&&r.url===PFXU[r.s]+r.id)?'':r.url,r.c,r.p,r.a,r.l,r.r,r.b,r.dpe,r.y,r.pub==='1970-01-01'?'':r.pub,r.mod==='1970-01-01'?'':r.mod,r.dec,r.q,Object.entries(r.f).map(([k,v])=>k+'='+v).join(',')].join('|'));
+ return h+'\n'+rows.join('\n')}
 async function bienici(){const Z=[-378685,-378869,-379281,-379895,-378879,-382564,-379898,-384073,-382567];const all=[];
  for(let from=0;from<1000;from+=100){const f={size:100,from,showAllModels:false,filterType:'buy',propertyType:['house'],maxPrice:400000,minArea:90,page:from/100+1,sortBy:'relevance',sortOrder:'desc',onTheMarket:[true],zoneIdsByTypes:{zoneIds:Z}};
   const j=await (await fetch('/realEstateAds.json?filters='+encodeURIComponent(JSON.stringify(f)))).json();const ads=j.realEstateAds||[];all.push(...ads);if(from+100>=j.total||!ads.length)break}
  return all.map(a=>({id:a.id,url:'https://www.bienici.com/annonce/'+a.id,c:a.city,p:a.price,a:Math.round(a.surfaceArea||0),l:Math.round(a.landSurfaceArea||0),r:a.roomsQuantity||0,b:a.bedroomsQuantity||0,t:a.title,d:String(a.description||'').replace(/<br\s*\/?>/gi,' '),pub:(a.publicationDate||'').slice(0,10),mod:(a.modificationDate||'').slice(0,10),pool:a.hasPool,clim:a.hasAirConditioning,garden:a.hasGarden,work:a.workToDo,dpe:a.energyClassification||'',y:a.yearOfConstruction||0,dec:a.priceHasDecreased,q:a.district&&a.district.libelle||''}))}
-window.VH={PAGES,CITIES,cityOf,classify,canon,pid,load,delta,bienici,htmlSource,leboncoin,parse,num,norm};
+window.VH={PAGES,CITIES,cityOf,classify,canon,pid,load,delta,bienici,htmlSource,leboncoin,pack,parse,num,norm};
 return 'VH prêt'})();

@@ -29,6 +29,13 @@ def set_price(x,newp,why):
     old=x['p'];x['p']=newp;h.append([TODAY,newp])
     if newp<old:x['pd']=1
     log['prix modifié']+=1;notes.append(f"{x['k']} {x['c']}: {old} → {newp} ({why})")
+def fuzzy(c,n):
+    for j,x in enumerate(L):
+        if x['c']!=c or abs(x['p']-n['p'])>1000:continue
+        if n['a'] and x['a'] and abs(x['a']-n['a'])>3:continue
+        if n['l'] and x['l'] and abs(x['l']-n['l'])>max(20,.1*x['l']):continue
+        if not (n['a'] or n['l']):continue
+        return j
 def dist(c,q):
     if (c,q) in QD:return QD[(c,q)]+(1,)
     if c=='Nîmes':return ('inconnue','Quartier non précisé, distance à la gare inconnue',0)
@@ -43,11 +50,28 @@ def exclusion(n,f):
         if c=='Nîmes' and not f.get('jd'):return 'Maison de ville sans vrai jardin'
         if c!='Nîmes' and f.get('mi')!='n' and not f.get('jd'):return 'Maison de ville ou de village sans vrai jardin'
     return ''
-files=sorted(glob.glob(D('scan/runs/d_*.json')))
+
+PFXU={"Bien'ici":'https://www.bienici.com/annonce/','Leboncoin':'https://www.leboncoin.fr/ad/ventes_immobilieres/'}
+def load_delta(fn):
+    raw=open(fn).read()
+    if raw.lstrip().startswith('{') and '\n' not in raw.strip().split('\n')[0][:0] and raw.count('\n')<=1 and '"nw"' in raw:
+        return json.loads(raw)
+    head,*rows=raw.strip().split('\n');h=json.loads(head);src=h['src']
+    d=dict(src=src,n=h['n'],seen=[],pp=h['pp'],up=h['up'],lk=[[i,l or src,u,p] for i,l,u,p in h['lk']],nw=[],skip=h.get('skip',0),errs=h.get('errs',[]))
+    for r in rows:
+        f=r.split('|')
+        id_,url,c,p,a,l,ro,b,dpe,y,pub,mod,dec,q,fl=f
+        flags={}
+        for kv in fl.split(','):
+            if kv:
+                k,v=kv.split('=');flags[k]=int(v) if v.lstrip('-').isdigit() else v
+        d['nw'].append(dict(s=src,id=id_,url=url or PFXU[src]+id_,c=c,p=int(p),a=int(a),l=int(l),r=int(ro),b=int(b),dpe=dpe,y=int(y),pub=pub,mod=mod,dec=int(dec),q=q,f=flags))
+    return d
+files=sorted(glob.glob(D('scan/runs/d_*')))
 if not files:print('aucun delta à appliquer');sys.exit(0)
 seen=set()
 for fn in files:
-    d=json.load(open(fn));src=d['src']
+    d=load_delta(fn);src=d['src']
     for i,lab,url,p in d['lk']:
         x=L[i]
         if not any(u[1]==url for u in x['u']):x['u'].append([lab,url,p]);log['liens ajoutés']+=1
@@ -70,6 +94,10 @@ for fn in files:
     for n in d['nw']:
         f=dict(ca=0,lg=0,g='?',pi='n',cl=0,mi='?',bu=0,pl=0,p2=0,tr='n',jd=0,vi=0,ms=0,ur=0,rx=0);f.update(n['f']);c=n['c'];k=PFX.get(n['s'],n['s'][:3].lower())+'-'+n['id'].replace('/','_')
         if any(x['k']==k for x in L):continue
+        j=fuzzy(c,n)
+        if j is not None:
+            if not any(u[1]==n['url'] for u in L[j]['u']):L[j]['u'].append([n['s'],n['url'],n['p']]);log['liens ajoutés (doublon de nouvelle annonce)']+=1
+            continue
         dc,dl,de=dist(c,n['q'])
         ex=exclusion(n,f)
         x=dict(k=k,c=c,q=n['q'],p=n['p'],o=0,a=n['a'],l=n['l'],r=n['r'],b=n['b'],be=0,dpe=n['dpe'],y=n['y'],g=f['g'],gm=0,cl=f['cl'],pi=f['pi'],ca=f['ca'],mi=f['mi'],bu=f['bu'],tr=f['tr'],pl=f['pl'],p2=f['p2'],pd=1 if n.get('dec') else 0,pa=0,pub=n['pub'] if n['pub']!='1970-01-01' else '',mod=n['mod'],dc=dc,dl=dl,de=de,u=[[n['s'],n['url'],n['p']]],grp='A' if c=='Nîmes' else 'B',st='',pm=0,vi=f['vi'],ms=f['ms'],jd=f['jd'],jt=0,te=0,tx=1,ex=ex,ur=f['ur'],lg=f['lg'],sd=TODAY)
