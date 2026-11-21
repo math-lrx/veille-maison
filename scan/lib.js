@@ -72,7 +72,7 @@ async function leboncoin(){const L=await load(),K=window.VH_K;const cps=['nimes_
  const out=await delta(R,'Leboncoin');out.errs=errs;out.found=R.length;return out}
 
 const PFXU={"Bien'ici":'https://www.bienici.com/annonce/','Leboncoin':'https://www.leboncoin.fr/ad/ventes_immobilieres/'};
-function pack(o){const h=JSON.stringify({src:o.src,n:o.n,seen:o.seen.length,pp:o.pp,up:o.up,lk:o.lk.map(x=>[x[0],x[1]==o.src?'':x[1],x[2],x[3]]),errs:o.errs||[],skip:o.skip});
+function pack(o){const h=JSON.stringify({src:o.src,n:o.n,seen:o.seen.length,pp:o.pp,up:o.up,lk:o.lk.map(x=>[x[0],x[1]==o.src?'':x[1],(PFXU[o.src]&&x[2].startsWith(PFXU[o.src]))?x[2].slice(PFXU[o.src].length):x[2],x[3]]),errs:o.errs||[],skip:o.skip});
  const rows=o.nw.map(r=>[r.id,(PFXU[r.s]&&r.url===PFXU[r.s]+r.id)?'':r.url,r.c,r.p,r.a,r.l,r.r,r.b,r.dpe,r.y,r.pub==='1970-01-01'?'':r.pub,r.mod==='1970-01-01'?'':r.mod,r.dec,r.q,Object.entries(r.f).map(([k,v])=>k+'='+v).join(',')].join('|'));
  return h+'\n'+rows.join('\n')}
 async function bienici(){const Z=[-378685,-378869,-379281,-379895,-378879,-382564,-379898,-384073,-382567];const all=[];

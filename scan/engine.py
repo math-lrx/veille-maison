@@ -57,7 +57,7 @@ def load_delta(fn):
     if raw.lstrip().startswith('{') and '\n' not in raw.strip().split('\n')[0][:0] and raw.count('\n')<=1 and '"nw"' in raw:
         return json.loads(raw)
     head,*rows=raw.strip().split('\n');h=json.loads(head);src=h['src']
-    d=dict(src=src,n=h['n'],seen=[],pp=h['pp'],up=h['up'],lk=[[i,l or src,u,p] for i,l,u,p in h['lk']],nw=[],skip=h.get('skip',0),errs=h.get('errs',[]))
+    d=dict(src=src,n=h['n'],seen=[],pp=h['pp'],up=h['up'],lk=[[i,l or src,(u if u.startswith('http') else PFXU[src]+u),p] for i,l,u,p in h['lk']],nw=[],skip=h.get('skip',0),errs=h.get('errs',[]))
     for r in rows:
         f=r.split('|')
         id_,url,c,p,a,l,ro,b,dpe,y,pub,mod,dec,q,fl=f
