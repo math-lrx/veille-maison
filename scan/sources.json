@@ -16,8 +16,8 @@
   "st": "bloque"
  },
  "ParuVendu": {
-  "m": "limite de débit",
-  "st": "bloque"
+  "m": "ok 2026-11-21 : NE PAS aller vite (429). Boucle maison manuelle, 2,5 s entre requêtes, /immobilier/vente/maison/<ville>/?p=n pour nimes ; <ville>-<cp> pour les communes (caissargues-30132, bouillargues-30230, redessan-30129, rodilhan-30230, garons-30128, manduel-30129, bellegarde-30127, generac-30510). Nettoyer le texte des cartes : retirer « photos N » avant de lire le prix. Ville = texte avant « (30) ».",
+  "st": "ok 2026-11-21"
  },
  "PAP": {
   "m": "ids g: Nîmes 43630, Caissargues 18424, Bouillargues 18500, Redessan 18470, Rodilhan 18529, Garons 18436, Manduel 18452, Générac 18659. URL /annonce/vente-maisons-<ville>-g<id>-jusqu-a-400000-euros-a-partir-de-90-m2-{p}, linkRe ^/annonces/maison-, ville tirée de l'URL. delay 2500 ms (429 sinon).",
@@ -53,7 +53,7 @@
  },
  "Agences locales": {
   "m": "Montaury, Moreira, Capitelles, Tissot, Atrium, Conception Immo, Cabinet Agir, Grand Nîmes, H4, Agence du Midi, Immoregard, Ceres, MPC, Patrimoine Habitat, Ici et Là, Bienveo, ImmoPlanète, Accent du Sud : htmlSource",
-  "st": "a valider"
+  "st": "non validé 2026-11-21 : Montaury (modèle La Boîte Immo) annonce 11 biens mais n'affiche aucune fiche dans la page ni dans le HTML ; à investiguer (appel XHR du site). Les autres agences non essayées."
  },
  "Injoignables connus": {
   "m": "Immobilier Manduel, Vaunage, Marguerittes, Pont-du-Gard, Méridional, Kyero, PLH, Calini, Immo-Diffusion, AD Immo, Set Immo, Pierres au Soleil, Maisons-Appartements",

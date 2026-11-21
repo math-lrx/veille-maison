@@ -18,4 +18,4 @@ Acteurs : Mathieu lance ; Claude (app de bureau, conversation liée à l'ordinat
 
 ## Sources
 Voir `sources.json` : méthode par site et statut du dernier essai.
-Relève du 2026-11-21 : Bien'ici, Leboncoin, AVendreALouer, PAP, Properstar, Notaires, Orpi, Laforêt, Century 21, Logic-Immo (partiel). Restent à valider : agences locales ; bloqués : SeLoger (403), ParuVendu (limite de débit). Un site non scanné garde sa date précédente affichée dans « À propos ».
+Relève du 2026-11-21 : Bien'ici, Leboncoin, AVendreALouer, PAP, Properstar, Notaires, Orpi, Laforêt, Century 21, Logic-Immo (partiel), ParuVendu (à cadence lente). Restent à valider : agences locales ; bloqué : SeLoger (403). Un site non scanné garde sa date précédente affichée dans « À propos ».
