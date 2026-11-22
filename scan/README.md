@@ -18,6 +18,9 @@ Julia/Mathieu ajoutent des annonces (SeLoger, etc.) via « + Ajouter une annonce
 3. `engine.py` les intègre (clé inchangée, donc les ⭐/notes de Mathieu et Julia sont conservés), signale un doublon possible, puis archive le fichier. L'entrée Firebase peut rester: la page ne l'affiche plus en double.
 Si une annonce manuelle est un doublon d'une annonce déjà scannée, le signaler à Mathieu; ne rien supprimer.
 
+## Properstar: filtre non fiable
+Le filtre « maison-villa » laisse passer des appartements. Avant import, ne garder que les annonces dont le titre/URL de fiche dit « Maison » (vérifier le `<title>` de la fiche si l'info manque), surtout si terrain = 0.
+
 ## Règles
 - Le moteur n'ajoute et ne modifie que: il ne supprime jamais une annonce (même disparue des sites), ce qui protège « Mes intérêts ».
 - Ne jamais contourner CAPTCHA, Cloudflare, limites de débit : marquer `bloque`/`injoignable` et passer.
