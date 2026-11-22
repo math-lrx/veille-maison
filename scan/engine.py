@@ -39,7 +39,7 @@ def fuzzy(c,n):
 def dist(c,q):
     if (c,q) in QD:return QD[(c,q)]+(1,)
     if c=='Nîmes':return ('inconnue','Quartier non précisé, distance à la gare inconnue',0)
-    t=DRIVE[c];return ('voiture' if t<=15 else 'loin','Estimation: ≈ %d min en voiture de la gare de Nîmes'%t,1)
+    t=DRIVE.get(c,20);return ('voiture' if t<=15 else 'loin','Estimation: ≈ %d min en voiture de la gare de Nîmes'%t,1)
 def exclusion(n,f):
     c=n['c']
     if f.get('vi'):return 'Viager ou nue-propriété'
@@ -68,7 +68,7 @@ def load_delta(fn):
         d['nw'].append(dict(s=src,id=id_,url=url or PFXU[src]+id_,c=c,p=int(p),a=int(a),l=int(l),r=int(ro),b=int(b),dpe=dpe,y=int(y),pub=pub,mod=mod,dec=int(dec),q=q,f=flags))
     return d
 files=sorted(glob.glob(D('scan/runs/d_*')))
-if not files:print('aucun delta à appliquer');sys.exit(0)
+if not files and not os.path.exists(D('scan/runs/manual.json')):print('aucun delta à appliquer');sys.exit(0)
 seen=set()
 for fn in files:
     d=load_delta(fn);src=d['src']
@@ -107,6 +107,21 @@ for fn in files:
         if s['n'].startswith(src.split(' ')[0]):s['st']='ok';s['d']=TODAY
     if not DRY:
         os.makedirs(D('scan/runs/done'),exist_ok=True);shutil.move(fn,D('scan/runs/done/'+TODAY+'_'+os.path.basename(fn)))
+# --- annonces ajoutées à la main (Firebase veille/manual, récupérées par le navigateur dans scan/runs/manual.json) ---
+mf=D('scan/runs/manual.json')
+if os.path.exists(mf):
+    for m in json.load(open(mf)):
+        k=m['k']
+        if any(x['k']==k for x in L):continue
+        f=dict(ca=0,lg=0,g='?',pi='n',cl=0,mi='?',bu=0,pl=0,p2=0,tr='n',jd=0);f.update(m.get('f',{}))
+        c=m['c'];dup=fuzzy(c,m)
+        dc,dl,de=dist(c,m.get('q',''))
+        pub=datetime.datetime.fromtimestamp(m.get('ts',0)/1000).date().isoformat() if m.get('ts') else TODAY
+        x=dict(k=k,c=c,q=m.get('q',''),p=m['p'],o=0,a=m.get('a',0),l=m.get('l',0),r=m.get('r',0),b=m.get('b',0),be=0,dpe=m.get('dpe',''),y=0,g=f['g'],gm=0,cl=f['cl'],pi=f['pi'],ca=f['ca'],mi=f['mi'],bu=f['bu'],tr=f['tr'],pl=f['pl'],p2=f['p2'],pd=0,pa=0,pub=pub,mod=pub,dc=dc,dl=dl,de=de,u=[[m.get('src') or 'Ajout manuel',m['u'],m['p']]],grp='A' if c=='Nîmes' else 'B',st='',pm=0,vi=0,ms=0,jd=f['jd'],jt=0,te=0,tx=1,ex='',ur=0,lg=f['lg'],sd=TODAY,nt=m.get('nt',''),man=1,by=m.get('by',''))
+        L.append(x);P['items'][k]=[[TODAY,m['p']]];log['annonces manuelles intégrées']+=1
+        notes.append(f"MANUEL {k} ({m.get('by','?')}) {c} {m['p']} €"+(f" [doublon possible de {L[dup]['k']}]" if dup is not None else ''))
+    if not DRY:
+        os.makedirs(D('scan/runs/done'),exist_ok=True);shutil.move(mf,D('scan/runs/done/'+TODAY+'_manual.json'))
 for i in seen:L[i]['sd']=TODAY
 P['scan']=TODAY
 if not DRY:

@@ -138,13 +138,30 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 .empty{padding:28px;text-align:center;color:var(--mute);background:var(--panel);border:1px dashed var(--line);border-radius:6px}
 .status{font-size:12px;color:var(--mute)}
 @media (max-width:640px){.it{grid-template-columns:minmax(0,1fr) auto}.price-col{grid-column:1/2}.main{grid-column:1/3;order:3}.act{grid-column:2/3;grid-row:1;flex-direction:row;min-width:0}.extra{grid-column:1/3;order:4}}
+.addb{border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:6px;padding:5px 10px;font:600 13px var(--f-b);cursor:pointer}
+.mdl{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:16px}
+.mdl[hidden]{display:none}
+.mdl form{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;max-width:620px;width:100%;padding:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mdl h2{grid-column:1/-1;margin:0;font:700 18px var(--f-d)}
+.mdl label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mute)}
+.mdl label.full,.mdl .full{grid-column:1/-1}
+.mdl input,.mdl select,.mdl textarea{font-size:14px;color:var(--ink)}
+.mdl .cks{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px}
+.mdl .cks label{flex-direction:row;align-items:center;gap:5px;color:var(--ink);font-size:13px}
+.mdl .btns{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.mdl .btns button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:7px 12px;font:600 13px var(--f-b);cursor:pointer}
+.mdl .btns button.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.mdl .msg{grid-column:1/-1;font-size:13px;color:var(--warn)}
+.manb{background:var(--cm);color:#fff}
+.delman{border:1px solid var(--line);background:transparent;color:var(--mute);border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;margin-left:8px}
+@media (max-width:520px){.mdl form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div id="who" role="dialog" aria-modal="true" aria-labelledby="whoT"><div class="whobox"><h2 id="whoT">Qui consulte la veille ?</h2><div>Choisissez votre profil pour retrouver vos choix.</div><div class="whobtns"><button type="button" data-u="m"><span class="big">M</span>Mathieu<small></small></button><button type="button" data-u="j"><span class="big">J</span>Julia<small></small></button></div><p>Vos choix, vos notes et ceux de l'autre sont affichés côte à côte; les désaccords sont signalés.</p></div></div>
 <div class="wrap">
 <div class="top"><h1>Veille maison Nîmes</h1><button id="whoBtn" type="button" hidden aria-label="Changer d'utilisateur"></button></div>
-<div class="meta"><span id="last"></span><button id="aboutBtn" type="button" class="lnk" aria-expanded="false" aria-controls="about">À propos et critères</button></div>
+<div class="meta"><span id="last"></span><button id="aboutBtn" type="button" class="lnk" aria-expanded="false" aria-controls="about">À propos et critères</button> <button id="addBtn" type="button" class="addb">+ Ajouter une annonce</button></div>
 <div id="about" class="about" hidden>
 <p><b>Critères de recherche.</b> Maisons à vendre jusqu'à 400 000 €, 90 m² minimum, 3 chambres minimum. Recherche A: Nîmes. Recherche B: Caissargues, Bouillargues, Redessan, Rodilhan, Garons, Manduel, Bellegarde, Générac.</p>
 <p><b>Sources.</b> Données du <span id="scan"></span>: Bien'ici, Leboncoin, SeLoger, ParuVendu, Orpi, Laforêt, Century 21, AVendreALouer, Logic-Immo, PAP, notaires et quelques agences locales (Montaury, Moreira), doublons fusionnés (Figaro Immo et Ouest-France Immo inaccessibles ou hors secteur).</p>
@@ -184,8 +201,26 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
 <div class="list" id="list"></div>
 <p class="foot">Distances à la gare centrale de Nîmes: pour Nîmes, calcul à vol d'oiseau depuis la position approximative de l'annonce (marche ≈ 1,3 fois plus longue), sauf si l'annonce cite un temps. Pour les communes, temps de voiture estimés. L'historique des prix démarre au premier relevé; l'ancien prix Leboncoin sert de repère quand il existe. Un garage ou une absence de mitoyenneté « non confirmé » n'a pas été trouvé dans le texte de l'annonce. Règles d'exclusion appliquées au texte des annonces: pas de permis de construire, maison de ville sans vrai jardin (recherche A), maison de ville ou de village non confirmée non mitoyenne ou sans vrai jardin (recherche B). Les biens exclus restent consultables avec la case « Afficher les exclus ». « Cave / sous-sol » recouvre cave, caveau, sous-sol et semi-enterré, lus dans le texte de l'annonce (non relevé sur les annonces dont le texte n'a pu être relu). Le symbole « 2 logements » signale une maison avec deux logements distincts ou un logement indépendant déjà aménagé (étage, studio, appartement attenant); « 2e logement possible » signale que l'annonce évoque la possibilité d'en créer un. La mention « moins cher » désigne la plateforme qui affiche le prix le plus bas pour un même bien, quand les prix diffèrent.</p>
 </div>
+<div id="addMdl" class="mdl" hidden role="dialog" aria-modal="true" aria-labelledby="addT">
+<form id="addForm" autocomplete="off">
+<h2 id="addT">Ajouter une annonce trouvée à la main</h2>
+<p class="full" style="margin:0;color:var(--mute);font-size:13px">Pour les sites que la veille ne peut pas lire (SeLoger, etc.). L'annonce apparaît tout de suite pour vous deux; elle est ensuite intégrée au classement à la prochaine mise à jour.</p>
+<label>Site<select id="aSrc"><option>SeLoger</option><option>Leboncoin</option><option>Bien'ici</option><option>PAP</option><option>Agence</option><option>Autre</option></select></label>
+<label>Lien de l'annonce (obligatoire)<input type="text" id="aUrl" inputmode="url" placeholder="https://..."></label>
+<label>Prix (€)<input type="text" id="aP" inputmode="numeric"></label>
+<label>Commune<select id="aC"></select></label>
+<label>Quartier (facultatif)<input type="text" id="aQ" maxlength="60"></label>
+<label>Surface habitable (m²)<input type="text" id="aA" inputmode="numeric"></label>
+<label>Terrain (m²)<input type="text" id="aL" inputmode="numeric"></label>
+<label>Chambres<input type="text" id="aB" inputmode="numeric" value="3"></label>
+<label>DPE<select id="aD"><option value="">?</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></label>
+<div class="cks" id="aF"><label><input type="checkbox" data-f="g"> Garage</label><label><input type="checkbox" data-f="pi"> Piscine</label><label><input type="checkbox" data-f="cl"> Clim</label><label><input type="checkbox" data-f="ca"> Cave / sous-sol</label><label><input type="checkbox" data-f="jd"> Jardin</label><label><input type="checkbox" data-f="mi"> Non mitoyenne</label><label><input type="checkbox" data-f="pl"> Plain-pied</label><label><input type="checkbox" data-f="tr"> Travaux / rafraîchissement</label><label><input type="checkbox" data-f="lg"> 2 logements</label></div>
+<label class="full">Note (facultatif)<textarea id="aN" rows="2" maxlength="500"></textarea></label>
+<div class="msg" id="aMsg" role="alert"></div>
+<div class="btns"><button type="button" id="aCancel">Annuler</button><button type="submit" class="go" id="aGo">Ajouter</button></div>
+</form></div>
 <script>
-let L=[],SCAN="2026-11-06",meta={};
+let L=[],L0=[],man={},SCAN="2026-11-06",meta={};
 const $=id=>document.getElementById(id);
 const eur=n=>n.toLocaleString('fr-FR').replace(/ /g,' ')+' €';
 let marks={},prices={items:{}},db=null,F={grp:'all',st:'act'},F_cities,scanSt=null;
@@ -206,6 +241,31 @@ function dv(x){const r=[];if(!U)return r;const a=(marks[x.k]||{}).s||'',b=om(x.k
  return r}
 function av(p,s){const g=s==='like'?'♥':s==='rej'?'✕':'…';const lab=s==='like'?ints(p):s==='rej'?'a rejeté':'à trier';return `<span class="av ${p}${s?'':' none'}" title="${NAMES[p]}: ${lab}"><b>${NAMES[p][0]}</b>${g}</span>`}
 let cities=[];
+
+const MCITIES=['Nîmes','Caissargues','Bouillargues','Redessan','Rodilhan','Garons','Manduel','Bellegarde','Générac'];
+function manToListing(id,m){const f=m.f||{};const t=m.ts?new Date(m.ts).toISOString().slice(0,10):'';
+ return{k:id,c:m.c,q:m.q||'',p:num(m.p),o:0,a:num(m.a),l:num(m.l),r:0,b:num(m.b),be:0,dpe:m.dpe||'',y:0,g:f.g?'o':'?',gm:0,cl:f.cl?1:0,pi:f.pi?'o':'n',ca:f.ca?1:0,mi:f.mi?'n':'?',bu:0,tr:f.tr?'l':'n',pl:f.pl?1:0,p2:0,pd:0,pa:0,pub:t,mod:t,dc:'inconnue',dl:'Distance à calculer à la prochaine mise à jour',de:0,u:[[m.src||'Ajout manuel',m.u,num(m.p)]],grp:m.c==='Nîmes'?'A':'B',st:'',pm:0,vi:0,ms:0,jd:f.jd?1:0,jt:0,te:0,tx:1,ex:'',ur:0,lg:f.lg?2:0,nt:m.nt||'',man:1,mo:1,by:m.by||""}}
+function rebuild(){const have=new Set(L0.map(x=>x.k));const extra=Object.entries(man).filter(([id,m])=>m&&m.u&&m.c&&!have.has(id)).map(([id,m])=>manToListing(id,m));L=L0.concat(extra);mkCities()}
+const canonU=u=>String(u||'').replace(/^https?:\/\/(www\.)?/i,'').replace(/[?#].*$/,'').replace(/\/$/,'').toLowerCase();
+function findDup(u,p,c,a,l){const cu=canonU(u);
+ return L.find(x=>x.u.some(v=>canonU(v[1])===cu))||L.find(x=>x.c===c&&Math.abs(x.p-p)<=1000&&(a||l)&&(!a||!x.a||Math.abs(x.a-a)<=3)&&(!l||!x.l||Math.abs(x.l-l)<=Math.max(20,.1*x.l))&&(a?x.a:x.l))}
+function openAdd(){if(!U){$('who').hidden=false;return}
+ $('aC').innerHTML=MCITIES.map(c=>`<option>${esc(c)}</option>`).join('');$('aMsg').textContent='';$('addForm').reset();$('aB').value='3';$('addMdl').hidden=false;$('aUrl').focus()}
+function closeAdd(){$('addMdl').hidden=true}
+let forceAdd=false,pinK='';
+async function submitAdd(e){e.preventDefault();const msg=$('aMsg');msg.textContent='';
+ const u=$('aUrl').value.trim(),p=+($('aP').value.replace(/\D/g,'')),a=+($('aA').value.replace(/\D/g,''))||0,l=+($('aL').value.replace(/\D/g,''))||0,b=+($('aB').value.replace(/\D/g,''))||0,c=$('aC').value;
+ if(!/^https?:\/\/\S+$/i.test(u)||u.length>600){msg.textContent="Collez le lien complet de l'annonce (il commence par https://).";return}
+ if(!(p>=20000&&p<=5000000)){msg.textContent='Indiquez le prix en euros.';return}
+ if(!a&&!l){msg.textContent='Indiquez au moins la surface habitable ou le terrain (sert à repérer les doublons).';return}
+ const d=findDup(u,p,c,a,l);
+ if(d&&!forceAdd){forceAdd=true;$('aGo').textContent='Ajouter quand même';msg.textContent=`Cette annonce semble déjà dans la liste: ${d.c}, ${eur(d.p)}, ${d.a} m². Vérifiez avant d'ajouter un doublon.`;return}
+ if(!db){msg.textContent='Base de suivi indisponible, réessayez dans un instant.';return}
+ const f={};$('aF').querySelectorAll('input:checked').forEach(i=>f[i.dataset.f]=1);
+ const id='man-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ const rec={by:U,ts:Date.now(),src:$('aSrc').value,u,p,c,q:$('aQ').value.trim().slice(0,60),a,l,b,dpe:$('aD').value,f,nt:$('aN').value.trim().slice(0,500)};
+ try{await db.doc('manual/'+id).set(rec);man[id]=rec;pinK=id;rebuild();closeAdd();forceAdd=false;$('aGo').textContent='Ajouter';render();window.scrollTo({top:0,behavior:'smooth'});$('st').textContent="Annonce ajoutée (en tête de liste pour l'instant). Marquez-la « Intéressé » si elle vous plaît.";setTimeout(()=>{$('st').textContent=''},6000)}
+ catch(err){msg.textContent="Ajout refusé par la base (les règles Firebase doivent être mises à jour): "+(err.message||err.code||'')}}
 const mkCities=()=>{cities=[...new Set(L.map(x=>x.c))].sort((a,b)=>a==='Nîmes'?-1:b==='Nîmes'?1:a.localeCompare(b,'fr'))};
 F_cities=new Set();
 function hist(x){return (prices.items&&prices.items[x.k])||[[null,x.o||x.p],[SCAN,x.p]].filter((h,i)=>i||x.o)}
@@ -250,7 +310,7 @@ function card(x){
  const hs=t.h.map(h=>`${h[0]?new Date(h[0]).toLocaleDateString('fr-FR'):'ancien prix affiché (date inconnue)'} ${eur(h[1])}`).join(' → ');
  const d=document.createElement('div');d.className='it '+s+(x.st?' sold':'')+(x.ex?' exc':'')+(os==='like'?' o-'+O():'')+(dd.includes('both')?' both':'')+(dd.includes('conf')?' cf':'');d.dataset.k=x.k;
  d.innerHTML=`${dd.length?`<div class="dvb">${dvHtml(x,dd,s,os)}</div>`:''}${x.st?`<div class="sbar">${x.st==='vendu'?'Vendu':'Sous compromis / sous offre'}: ne plus compter dessus</div>`:''}<div class="price-col"><div class="price">${eur(t.last)}</div>${drop}</div>
- <div class="main"><div class="loc">${esc(x.c)}${U?`<span class="who">${av(U,s)}${av(O(),os)}</span>`:''}${x.q&&x.q!==x.c?` <small>· ${esc(x.q)}</small>`:''}</div>
+ <div class="main"><div class="loc">${esc(x.c)}${U?`<span class="who">${av(U,s)}${av(O(),os)}</span>`:''}${x.q&&x.q!==x.c?` <small>· ${esc(x.q)}</small>`:''}${x.man?` <span class="b manb">Ajoutée par ${esc(NAMES[x.by]||'?')}</span>${x.mo?`<button type="button" class="delman" data-delman="${esc(x.k)}">Retirer</button>`:''}`:''}</div>
  <div class="spec">${num(x.a)} m² · ${x.l?num(x.l)+' m² terrain':'terrain ?'} · ${num(x.b)} ch${x.be?' (estimé)':''} · ${num(x.r)} pièces${x.dpe?' · DPE '+esc(x.dpe):''}${x.y?' · '+num(x.y):''}</div>
  <div class="badges">${badges(x)}</div>
  <div class="dist"><span class="pill ${esc(x.dc)}">${{pied:'À pied',court:'Proche',voiture:'Voiture',loin:'Plus loin',inconnue:'À vérifier'}[x.dc]}</span><span class="${x.de?'est':''}">${esc(x.dl)}</span></div>
@@ -295,7 +355,7 @@ function chips(){
 }
 function render(){chips();alerts();
  const keep=document.activeElement&&document.activeElement.classList.contains('note')?document.activeElement.id:null;
- const rows=L.filter(x=>pass(x)).sort(sorter());
+ const rows=L.filter(x=>pass(x)).sort(sorter());if(pinK){const i=rows.findIndex(x=>x.k===pinK);if(i>0)rows.unshift(rows.splice(i,1)[0])}
  const el=$('list');el.innerHTML='';
  if(!rows.length){el.innerHTML='<div class="empty">Aucun bien ne correspond à ces filtres.</div>'}
  rows.slice(0,200).forEach(x=>el.appendChild(card(x)));
@@ -304,6 +364,9 @@ function render(){chips();alerts();
  $('cnt').textContent=`${rows.length} bien${rows.length>1?'s':''} affiché${rows.length>1?'s':''} sur ${L.length} · ${n.filter(m=>m.s==='like').length} intéressé(s) · ${n.filter(m=>m.s==='rej').length} rejeté(s)`+(U?` · ${no.filter(m=>m.s==='like').length} pour ${NAMES[O()]}`:'')+(rows.length>200?' · 200 premiers':'');
  if(keep&&$(keep))$(keep).focus()}
 document.addEventListener('click',async e=>{
+ if(e.target.closest('#addBtn')){openAdd();return}
+ if(e.target.closest('#aCancel')){closeAdd();forceAdd=false;$('aGo').textContent='Ajouter';return}
+ const dm=e.target.closest('[data-delman]');if(dm){const id=dm.dataset.delman;if(dm.dataset.sure!=='1'){dm.dataset.sure='1';dm.textContent='Confirmer le retrait';return}try{await db.doc('manual/'+id).del();delete man[id];rebuild();render()}catch(err){$('st').textContent='Retrait refusé: '+(err.message||err.code)}return}
  if(e.target.closest('#aboutBtn')){const a=$('about'),b=$('aboutBtn');a.hidden=!a.hidden;b.setAttribute('aria-expanded',String(!a.hidden));return}
  const wu=e.target.closest('[data-u]');if(wu){chooseUser(wu.dataset.u);return}
  if(e.target.closest('#whoBtn')){$('who').hidden=false;return}
@@ -322,6 +385,7 @@ function save(k,data){const u=U;
  clearTimeout(pend[k+'_t']);pend[k+'_t']=setTimeout(async()=>{const d=pend[k];delete pend[k];
   try{await db.doc(COL[u]+'/'+k).set(Object.assign({},all[u][k],{u:Date.now()}));$('st').textContent=''}catch(err){$('st').textContent='Enregistrement refusé: '+(err.message||err.code)}},data.n!==undefined?700:50)}
 document.addEventListener('input',e=>{if(e.target.classList.contains('note')){const k=e.target.closest('.it').dataset.k;marks[k]=Object.assign({},marks[k],{n:e.target.value});save(k,{n:e.target.value})}});
+$('addForm').addEventListener('submit',submitAdd);document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('addMdl').hidden)closeAdd()});
 ['fDist','fBd','fSort','tG','tP','tC','tM','tV','tL','tD','tT'].forEach(i=>$(i).addEventListener('change',render));
 ['fMax','fAmin','fAmax','tX'].forEach(i=>$(i).addEventListener('change',render));
 try{const lu=localStorage.getItem('veille_u');if(lu&&NAMES[lu]){const sm=document.querySelector('#who [data-u='+lu+'] small');if(sm)sm.textContent='dernier choix sur cet appareil'}}catch(e){}
@@ -332,13 +396,13 @@ async function openDb(){
   firebase.initializeApp(FB);const rdb=firebase.database();const ref=p=>rdb.ref('veille/'+p);
   const clean=o=>JSON.parse(JSON.stringify(o));
   return{collection:n=>({onSnapshot:(cb,er)=>ref(n).on('value',s=>{const v=s.val()||{};cb({docs:Object.entries(v).map(([id,d])=>({id,data:()=>d}))})},e=>er&&er({code:e.code||'erreur'}))}),
-   doc:p=>({set:d=>ref(p).set(clean(d)),onSnapshot:(cb,er)=>ref(p).on('value',s=>cb({exists:s.exists(),data:()=>s.val()}),e=>er&&er(e))})}
+   doc:p=>({set:d=>ref(p).set(clean(d)),del:()=>ref(p).remove(),onSnapshot:(cb,er)=>ref(p).on('value',s=>cb({exists:s.exists(),data:()=>s.val()}),e=>er&&er(e))})}
  }catch(e){console.log("DBERR "+(e&&e.message||e));return null}}
 async function getJson(p){const r=await fetch(p+'?v='+Date.now());if(!r.ok)throw new Error(p);return r.json()}
 async function boot(){
- try{const[l,p,m]=await Promise.all([getJson('data/listings.json'),getJson('data/prices.json'),getJson('data/meta.json').catch(()=>({}))]);L=l;prices=p;meta=m;if(p.scan)SCAN=p.scan}
+ try{const[l,p,m]=await Promise.all([getJson('data/listings.json'),getJson('data/prices.json'),getJson('data/meta.json').catch(()=>({}))]);L0=l;L=l;prices=p;meta=m;if(p.scan)SCAN=p.scan}
  catch(e){$('st').textContent='Impossible de charger les annonces. Rechargez la page.';return}
- mkCities();renderLast();render();
+ rebuild();renderLast();render();
  
  db=await openDb()
  if(!db){$('st').textContent='Connexion à la base de suivi impossible: vos choix ne seront pas enregistrés. Vérifiez la connexion et rechargez.';return}
@@ -346,6 +410,7 @@ async function boot(){
  ['m','j'].forEach(p=>db.collection(COL[p]).onSnapshot(s=>{clearTimeout(t);const o={};s.docs.forEach(d=>o[d.id]=d.data());
   const ae=document.activeElement;if(p===U&&ae&&ae.classList&&ae.classList.contains('note')){const kk=ae.closest('.it').dataset.k;if(o[kk])o[kk]=Object.assign({},o[kk],{n:marks[kk]&&marks[kk].n!==undefined?marks[kk].n:o[kk].n})}
   all[p]=o;if(p===U)marks=o;render()},e=>{clearTimeout(t);$('st').textContent='Suivi indisponible ('+e.code+').'}));
+ db.collection('manual').onSnapshot(s=>{const o={};s.docs.forEach(d=>o[d.id]=d.data());man=o;rebuild();render()},()=>{});
  db.doc('scan/status').onSnapshot(s=>{scanSt=s.exists?s.data():null;renderScan()},()=>{});
 }
 boot();

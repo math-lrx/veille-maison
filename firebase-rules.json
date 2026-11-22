@@ -17,6 +17,13 @@
           ".validate": "newData.hasChildren() && (!newData.child('s').exists() || newData.child('s').val()==='' || newData.child('s').val()==='like' || newData.child('s').val()==='rej') && (!newData.child('n').exists() || (newData.child('n').isString() && newData.child('n').val().length<=2000))"
         }
       },
+      "manual": {
+        ".read": true,
+        "$id": {
+          ".write": true,
+          ".validate": "!newData.exists() || (newData.hasChildren(['by','u','c','p']) && (newData.child('by').val()==='m' || newData.child('by').val()==='j') && newData.child('u').isString() && newData.child('u').val().matches(/^https?:\\/\\/.*/) && newData.child('u').val().length<=600 && newData.child('p').isNumber() && newData.child('p').val()>=20000 && newData.child('p').val()<=5000000 && newData.child('c').isString() && newData.child('c').val().length<=40 && (!newData.child('nt').exists() || (newData.child('nt').isString() && newData.child('nt').val().length<=500)) && (!newData.child('q').exists() || (newData.child('q').isString() && newData.child('q').val().length<=60)))"
+        }
+      },
       "scan": {
         ".read": true,
         "status": {
